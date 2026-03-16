@@ -1,0 +1,21 @@
+[
+  {
+    "desc_ja": "NLP2026：機械文としての検出されやすさと\n文章の品質は両立する",
+    "desc_en": "NLP2026: Machine-Text Detectability and\nTask Performance Are Not at Odds",
+    "items": [
+      {
+        "type_ja": "論文",
+        "type_en": "Paper",
+        "qrSrc": "recent_items/qrsrc/qr_nlp2026_paper.png",
+        "link": "https://anlp.jp/proceedings/annual_meeting/2026/pdf_dir/B2-3.pdf"
+      },
+      {
+        "type_ja": "ポスター",
+        "type_en": "Poster",
+        "qrSrc": "recent_items/qrsrc/qr_nlp2026_poster.png",
+        "link": "https://drive.google.com/file/d/14vqynAhdR2RKLrm1PEMaUXXGR9CEFzpE/view?usp=drive_link"
+      }
+    ],
+    "date": "2026-03"
+  }
+]
