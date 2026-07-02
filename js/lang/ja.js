@@ -7,7 +7,7 @@ const LANG = {
   organization:'勤め先', role:'役職',
   skill:'スキル', description:'内容',
   all:'すべて', firstOnly:'主著のみ', awardOnly:'受賞あり',
-  domestic:'国内', international:'国際', language:'語学', technical:'技術',
+  domestic:'国内', international:'国際',
   firstAuthor:'主著', coAuthor:'共著', ongoing:'在学中', completed:'修了',
   paper:'論文', slides:'スライド', poster:'ポスター',
   copy:'コピー', copied:'コピー済み ✓',
