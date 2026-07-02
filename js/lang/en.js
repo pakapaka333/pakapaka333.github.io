@@ -7,7 +7,7 @@ const LANG = {
   organization:'Organization', role:'Role',
   skill:'Skill', description:'Details',
   all:'All', firstOnly:'1st Author', awardOnly:'Awarded',
-  domestic:'Domestic', international:'International', language:'Language', technical:'Technical',
+  domestic:'Domestic', international:'International',
   firstAuthor:'1st Author', coAuthor:'Co-author', ongoing:'Ongoing', completed:'Completed',
   paper:'Paper', slides:'Slides', poster:'Poster',
   copy:'Copy', copied:'Copied ✓',

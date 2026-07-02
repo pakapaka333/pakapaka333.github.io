@@ -11,7 +11,10 @@
     "Swallow LLM: Student Lead, Evaluation Team",
     "PUPPET: Detectable LLM"
   ],
-  "linkedin": "https://www.linkedin.com/in/koshiro-saito/",
-  "x": "https://x.com/koshiro_sa110",
-  "scholar": "https://scholar.google.co.jp/citations?user=h8HGRU4AAAAJ"
+  "links": [
+    { "type": "linkedin", "url": "https://www.linkedin.com/in/koshiro-saito/" },
+    { "type": "x", "url": "https://x.com/koshiro_sa110" },
+    { "type": "scholar", "url": "https://scholar.google.co.jp/citations?user=h8HGRU4AAAAJ" },
+    { "type": "github", "url": "https://github.com/pakapaka333" }
+  ]
 }

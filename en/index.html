@@ -3,7 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Page</title>
+<title>Koshiro Saito (齋藤 幸史郎)</title>
+<!-- <meta name="description" content=""> -->
+<link rel="canonical" href="https://pakapaka333.github.io/en/">
+<link rel="alternate" hreflang="ja" href="https://pakapaka333.github.io/">
+<link rel="alternate" hreflang="en" href="https://pakapaka333.github.io/en/">
+<link rel="alternate" hreflang="x-default" href="https://pakapaka333.github.io/">
+<link rel="icon" type="image/png" href="../figures/favicon.png">
+<link rel="apple-touch-icon" href="../figures/apple-touch-icon.png">
+<!-- OGP / Twitter Card -->
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Koshiro Saito (齋藤 幸史郎)">
+<!-- <meta property="og:description" content=""> -->
+<meta property="og:url" content="https://pakapaka333.github.io/en/">
+<meta property="og:image" content="https://pakapaka333.github.io/figures/face_picture_trimmed.png">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ja_JP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Koshiro Saito (齋藤 幸史郎)">
+<!-- <meta name="twitter:description" content=""> -->
+<meta name="twitter:image" content="https://pakapaka333.github.io/figures/face_picture_trimmed.png">
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Koshiro Saito",
+  "alternateName": "齋藤 幸史郎",
+  "url": "https://pakapaka333.github.io/en/",
+  "image": "https://pakapaka333.github.io/figures/face_picture_trimmed.png",
+  "affiliation": {
+    "@type": "CollegeOrUniversity",
+    "name": "Institute of Science Tokyo"
+  }
+}
+</script>
+<!-- sameAs (SNS links) is injected by app.js from profile/profile.json links -->
+
 <!-- Apply stored theme before render to prevent flash -->
 <script>
   (function(){
@@ -16,11 +52,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
-<!-- en/ subdir: override image paths to point up one level -->
-<style>
-  .header-bg    { background-image: url('../figures/header.jpg'); }
-  .face-photo   { background-image: url('../figures/face_picture_trimmed.png'); }
-</style>
+<!-- 画像パスは css/style.css に一元化(CSS の url() はスタイルシート基準で解決されるため en/ でも同じものが使える) -->
 </head>
 <body>
 
@@ -69,6 +101,14 @@
 <main class="main" id="mainContent">
   <p style="text-align:center;color:var(--muted);padding:48px 0;">Loading…</p>
 </main>
+
+<noscript>
+  <div style="max-width:1100px;margin:0 auto;padding:24px 48px;">
+    <p>This page requires JavaScript.</p>
+    <p>Koshiro Saito (齋藤 幸史郎) — M2 student, School of Computing, Institute of Science Tokyo.
+      See <a href="https://scholar.google.co.jp/citations?user=h8HGRU4AAAAJ">Google Scholar</a> for publications.</p>
+  </div>
+</noscript>
 
 <script src="../js/lang/en.js"></script>
 <script src="../js/app.js"></script>
