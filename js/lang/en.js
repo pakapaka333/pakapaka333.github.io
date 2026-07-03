@@ -7,6 +7,7 @@ const LANG = {
   organization:'Organization', role:'Role',
   skill:'Skill', description:'Details',
   all:'All', firstOnly:'1st Author', awardOnly:'Awarded',
+  allYears:'All years', yearFilter:'Filter by year',
   domestic:'Domestic', international:'International',
   firstAuthor:'1st Author', coAuthor:'Co-author', ongoing:'Ongoing', completed:'Completed',
   paper:'Paper', slides:'Slides', poster:'Poster',
@@ -15,5 +16,6 @@ const LANG = {
   remaining: n => `+${n} more`,
   noResults:'No matching results.',
   recentContent:'Recent Work',
+  toc:'Table of contents',
   theme: { switchToDark:'Switch to dark mode', switchToLight:'Switch to light mode' },
 };

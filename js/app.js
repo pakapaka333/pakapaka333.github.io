@@ -217,9 +217,20 @@ function renderQR(items, lang, dataRoot) {
   });
 }
 
-/* ── Section toggle ── */
+/* ── Section toggle (クリック + キーボード操作対応) ── */
 function initToggle(card) {
-  card.querySelector('.section-header').addEventListener('click', () => card.classList.toggle('collapsed'));
+  const h = card.querySelector('.section-header');
+  h.tabIndex = 0;
+  h.setAttribute('role', 'button');
+  h.setAttribute('aria-expanded', 'true');
+  const toggle = () => {
+    const collapsed = card.classList.toggle('collapsed');
+    h.setAttribute('aria-expanded', String(!collapsed));
+  };
+  h.addEventListener('click', toggle);
+  h.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+  });
 }
 
 /* ════════════════════════════════════════════
@@ -344,6 +355,10 @@ async function buildResearchSection(data, lang, dataRoot) {
     r._authors = extractAuthors(bibtexTexts[i]);
   });
 
+  // 年フィルター: データの period から自動生成(降順)。
+  // 年数が増えても UI が伸びないよう、ボタン列ではなくプルダウンで提供する。
+  const years = [...new Set(data.map(r => (r.period?.match(/^(\d{4})/) || [])[1]).filter(Boolean))]
+    .sort().reverse();
   const filterBar = `<div class="filter-bar" id="researchFilters">
     <button class="filter-btn active" data-filter="all">${LANG.all}</button>
     <button class="filter-btn" data-filter="first">${LANG.firstOnly}</button>
@@ -351,6 +366,11 @@ async function buildResearchSection(data, lang, dataRoot) {
     <div class="filter-separator"></div>
     <button class="filter-btn" data-filter="domestic">${LANG.domestic}</button>
     <button class="filter-btn" data-filter="international">${LANG.international}</button>
+    <div class="filter-separator"></div>
+    <select class="filter-select" id="researchYearSelect" aria-label="${LANG.yearFilter}">
+      <option value="all">${LANG.allYears}</option>
+      ${years.map(y => `<option value="${y}">${y}</option>`).join('')}
+    </select>
   </div>`;
 
   const rows = data.map((r, idx) => {
@@ -375,8 +395,14 @@ async function buildResearchSection(data, lang, dataRoot) {
       <div class="td-authors" id="${aId}">${r._authors}</div>
       <button class="authors-toggle" onclick="toggleAuthors('${aId}',this)">${LANG.expand}</button>` : '';
 
+    const authorBadge = isFirst
+      ? `<span class="badge badge-first">${LANG.firstAuthor}</span>`
+      : `<span class="badge-coauthor">${LANG.coAuthor}</span>`;
+    // モバイルでは著者区分・受賞を2列目に畳み込む(デスクトップでは非表示)
+    const mobileMeta = `<div class="td-mobile-meta">${authorBadge}${hasAward ? renderAwards(awardStr) : ''}</div>`;
+
     return `<tr class="research-row"
-        data-period="${periodToDate(r.period)}"
+        data-period="${periodToDate(r.period)}" data-year="${(r.period?.match(/^(\d{4})/) || [])[1] ?? ''}"
         data-first="${isFirst}" data-award="${hasAward}" data-domestic="${isDomestic}">
       <td class="td-period">${r.period}</td>
       <td>
@@ -387,11 +413,10 @@ async function buildResearchSection(data, lang, dataRoot) {
           ${venueHtml}
         </div>
         ${links.length ? `<div class="paper-links">${links.join('')}</div>` : ''}
+        ${mobileMeta}
       </td>
-      <td style="white-space:nowrap;vertical-align:top;padding-top:15px;">
-        ${isFirst ? `<span class="badge badge-first">${LANG.firstAuthor}</span>` : `<span class="badge-coauthor">${LANG.coAuthor}</span>`}
-      </td>
-      <td style="min-width:130px;vertical-align:top;padding-top:15px;">${renderAwards(awardStr)}</td>
+      <td class="hide-mobile" style="white-space:nowrap;vertical-align:top;padding-top:15px;">${authorBadge}</td>
+      <td class="hide-mobile" style="min-width:130px;vertical-align:top;padding-top:15px;">${renderAwards(awardStr)}</td>
     </tr>`;
   }).join('');
 
@@ -399,8 +424,8 @@ async function buildResearchSection(data, lang, dataRoot) {
     <thead><tr>
       <th class="sortable">${LANG.period}</th>
       <th>${LANG.titleVenue}</th>
-      <th>${LANG.authors}</th>
-      <th>${LANG.award}</th>
+      <th class="hide-mobile">${LANG.authors}</th>
+      <th class="hide-mobile">${LANG.award}</th>
     </tr></thead>
     <tbody id="researchBody">${rows}</tbody>
   </table></div>`;
@@ -412,6 +437,7 @@ function initResearchTable(data) {
   const sortState = { col: -1, dir: 'asc' };
   const excl = new Set(['domestic', 'international']);
   const activeFilters = new Set();
+  const yearSelect = document.getElementById('researchYearSelect');
   const getVisibleRows = () => Array.from(tbody.querySelectorAll('tr.research-row:not(.row-hidden)'));
 
   const sec = document.getElementById('sec-research');
@@ -438,29 +464,44 @@ function initResearchTable(data) {
     if (data[idx]?._bibtex) openBibtexModal(data[idx]._bibtex);
   });
 
+  // ボタン・セレクトの見た目を activeFilters と同期する
+  const syncFilterUI = () => {
+    document.querySelectorAll('#researchFilters .filter-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.filter === 'all' ? activeFilters.size === 0 : activeFilters.has(b.dataset.filter))
+    );
+    yearSelect.classList.toggle('active', yearSelect.value !== 'all');
+  };
+
   document.querySelectorAll('#researchFilters .filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const f = btn.dataset.filter;
-      if (f === 'all') { activeFilters.clear(); }
+      if (f === 'all') { activeFilters.clear(); yearSelect.value = 'all'; }
       else {
         if (activeFilters.has(f)) { activeFilters.delete(f); }
         else { if (excl.has(f)) excl.forEach(g => activeFilters.delete(g)); activeFilters.add(f); }
       }
-      document.querySelectorAll('#researchFilters .filter-btn').forEach(b =>
-        b.classList.toggle('active', b.dataset.filter === 'all' ? activeFilters.size === 0 : activeFilters.has(b.dataset.filter))
-      );
+      syncFilterUI();
       applyResearchFilter(activeFilters, reapply);
     });
+  });
+
+  yearSelect.addEventListener('change', () => {
+    [...activeFilters].filter(f => f.startsWith('year-')).forEach(f => activeFilters.delete(f));
+    if (yearSelect.value !== 'all') activeFilters.add(`year-${yearSelect.value}`);
+    syncFilterUI();
+    applyResearchFilter(activeFilters, reapply);
   });
 }
 
 function applyResearchFilter(activeFilters, onDone) {
+  const activeYear = [...activeFilters].find(f => f.startsWith('year-'));
   document.querySelectorAll('.research-row').forEach(tr => {
     let show = true;
     if (activeFilters.has('first')         && tr.dataset.first    !== 'true') show = false;
     if (activeFilters.has('award')         && tr.dataset.award    !== 'true') show = false;
     if (activeFilters.has('domestic')      && tr.dataset.domestic !== 'true') show = false;
     if (activeFilters.has('international') && tr.dataset.domestic === 'true') show = false;
+    if (activeYear && `year-${tr.dataset.year}` !== activeYear) show = false;
     tr.classList.toggle('row-hidden', !show);
   });
   const tbody = document.getElementById('researchBody');
@@ -486,19 +527,21 @@ function buildActivitiesSection(data, lang) {
     const details  = field(r, 'details', lang);
     const awardStr = field(r, 'award',   lang);
     const titleHtml = linkWrap(title, r.link);
+    const hasAward = awardStr && awardStr.trim() !== '';
+    const mobileMeta = `<div class="td-mobile-meta">${details ? `<span class="mm-text">${details}</span>` : ''}${hasAward ? renderAwards(awardStr) : ''}</div>`;
     return `<tr class="activity-row" data-period="${periodToDate(r.period)}">
       <td class="td-period">${r.period}</td>
-      <td class="td-main">${titleHtml}</td>
-      <td class="td-sub" style="color:var(--text);">${details}</td>
-      <td style="min-width:120px;">${renderAwards(awardStr)}</td>
+      <td><div class="td-main">${titleHtml}</div>${mobileMeta}</td>
+      <td class="td-sub hide-mobile" style="color:var(--text);">${details}</td>
+      <td class="hide-mobile" style="min-width:120px;">${renderAwards(awardStr)}</td>
     </tr>`;
   }).join('');
   return `<div class="table-wrap"><table id="activitiesTable">
     <thead><tr>
       <th class="sortable">${LANG.period}</th>
       <th>${LANG.title}</th>
-      <th>${LANG.details}</th>
-      <th>${LANG.award}</th>
+      <th class="hide-mobile">${LANG.details}</th>
+      <th class="hide-mobile">${LANG.award}</th>
     </tr></thead>
     <tbody id="activitiesBody">${rows}</tbody>
   </table></div>`;
@@ -533,24 +576,25 @@ function buildEducationSection(data, lang) {
     const ongoing     = r.status === '在学中' || r.status === 'ongoing';
     const statusLabel = ongoing ? LANG.ongoing : LANG.completed;
     const sb = `<span class="badge ${ongoing ? 'badge-status-ongoing' : 'badge-status-done'}">${statusLabel}</span>`;
-    const db = degree ? `<span class="badge" style="background:var(--accent-lt);color:var(--accent);border:1px solid #a8dcf0;margin-right:4px;">${degree}</span>` : '';
+    const db = degree ? `<span class="badge" style="background:var(--accent-lt);color:var(--accent);border:1px solid var(--accent-bd);margin-right:4px;">${degree}</span>` : '';
     // distinction badge — gold-tinted
     const distBadge = distinction
       ? `<span class="badge badge-distinction" style="margin-top:4px;display:inline-flex;">🎖 ${distinction}</span>`
       : '';
+    const mobileMeta = `<div class="td-mobile-meta">${dept ? `<span class="mm-text">${dept}</span>` : ''}${db}${sb}${distBadge}</div>`;
     return `<tr class="education-row" data-period="${periodToDate(r.period)}" data-school="${school}">
       <td class="td-period">${r.period}</td>
-      <td class="td-main">${school}</td>
-      <td>${dept}</td>
-      <td style="white-space:nowrap;">${db}${sb}${distBadge ? '<br>' + distBadge : ''}</td>
+      <td><div class="td-main">${school}</div>${mobileMeta}</td>
+      <td class="hide-mobile">${dept}</td>
+      <td class="hide-mobile" style="white-space:nowrap;">${db}${sb}${distBadge ? '<br>' + distBadge : ''}</td>
     </tr>`;
   }).join('');
   return `<div class="table-wrap"><table id="educationTable">
     <thead><tr>
       <th class="sortable">${LANG.period}</th>
       <th class="sortable">${LANG.school}</th>
-      <th>${LANG.department}</th>
-      <th>${LANG.degreeStatus}</th>
+      <th class="hide-mobile">${LANG.department}</th>
+      <th class="hide-mobile">${LANG.degreeStatus}</th>
     </tr></thead>
     <tbody id="educationBody">${rows}</tbody>
   </table></div>`;
@@ -578,17 +622,18 @@ function buildBusinessSection(data, lang) {
   const rows = data.map(r => {
     const company = field(r, 'company', lang);
     const role    = field(r, 'role',    lang);
+    const mobileMeta = role ? `<div class="td-mobile-meta"><span class="mm-text">${role}</span></div>` : '';
     return `<tr class="business-row" data-period="${periodToDate(r.period)}" data-company="${company}">
       <td class="td-period">${r.period}</td>
-      <td class="td-main">${company}</td>
-      <td class="td-sub" style="color:var(--text)">${role}</td>
+      <td><div class="td-main">${company}</div>${mobileMeta}</td>
+      <td class="td-sub hide-mobile" style="color:var(--text)">${role}</td>
     </tr>`;
   }).join('');
   return `<div class="table-wrap"><table id="businessTable">
     <thead><tr>
       <th class="sortable">${LANG.period}</th>
       <th class="sortable">${LANG.organization}</th>
-      <th>${LANG.role}</th>
+      <th class="hide-mobile">${LANG.role}</th>
     </tr></thead>
     <tbody id="businessBody">${rows}</tbody>
   </table></div>`;
@@ -669,6 +714,87 @@ function initSkillsTable() {
 }
 
 /* ════════════════════════════════════════════
+   TOC SIDEBAR — セクションから自動生成。開閉状態は localStorage に保存。
+   モバイルは初期状態で閉じる。
+════════════════════════════════════════════ */
+function buildTOC() {
+  const sections = document.querySelectorAll('.section-card');
+  if (!sections.length) return;
+
+  const toc = document.createElement('nav');
+  toc.className = 'toc';
+  toc.id = 'tocNav';
+  toc.setAttribute('aria-label', LANG.toc);
+  const title = document.createElement('div');
+  title.className = 'toc-title';
+  title.textContent = 'Contents';
+  toc.appendChild(title);
+  sections.forEach(sec => {
+    const label = sec.querySelector('.section-label')?.textContent ?? sec.id;
+    const dotClass = [...(sec.querySelector('.section-dot')?.classList ?? [])].find(c => c.startsWith('dot-')) ?? '';
+    const a = document.createElement('a');
+    a.className = 'toc-link';
+    a.href = `#${sec.id}`;
+    a.innerHTML = `<span class="toc-dot ${dotClass}"></span><span>${label}</span>`;
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      sec.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    });
+    toc.appendChild(a);
+  });
+
+  const btn = document.createElement('button');
+  btn.className = 'toc-toggle';
+  btn.id = 'tocToggle';
+  btn.textContent = '☰';
+  btn.setAttribute('aria-label', LANG.toc);
+  btn.setAttribute('aria-controls', 'tocNav');
+  btn.addEventListener('click', () => {
+    const hidden = toc.classList.toggle('toc-hidden');
+    localStorage.setItem('tocHidden', hidden ? '1' : '0');
+    btn.setAttribute('aria-expanded', String(!hidden));
+  });
+
+  // 初期状態: 保存値があればそれに従う。なければ「コンテンツ左に十分な余白がある
+  // 広い画面(1400px以上)」のみ開いた状態にする(狭い画面では本文に重なるため)
+  const stored = localStorage.getItem('tocHidden');
+  const startHidden = stored !== null ? stored === '1' : !window.matchMedia('(min-width: 1400px)').matches;
+  if (startHidden) toc.classList.add('toc-hidden');
+  btn.setAttribute('aria-expanded', String(!startHidden));
+
+  document.body.append(btn, toc);
+}
+
+/* ── スクロール連動: 固定コントロールの配色切替 + 目次の現在地ハイライト ── */
+function initScrollUI() {
+  const controls = document.querySelector('.fixed-controls');
+  const header = document.querySelector('.header-wrap');
+  const links = [...document.querySelectorAll('.toc-link')];
+  const onScroll = () => {
+    if (controls && header) controls.classList.toggle('scrolled', window.scrollY > header.offsetHeight - 70);
+    let active = null;
+    document.querySelectorAll('.section-card').forEach(sec => {
+      if (sec.getBoundingClientRect().top <= 130) active = sec.id;
+    });
+    links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${active}`));
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+/* ── ソート可能な見出しのキーボード操作対応 ── */
+function initSortableA11y() {
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.tabIndex = 0;
+    th.setAttribute('role', 'button');
+    th.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); th.click(); }
+    });
+  });
+}
+
+/* ════════════════════════════════════════════
    initPage — entry point called by each HTML page
 ════════════════════════════════════════════ */
 async function initPage(lang, dataRoot) {
@@ -706,4 +832,8 @@ async function initPage(lang, dataRoot) {
 
   main.appendChild(makeSection({ id:'sec-skills', dotClass:'dot-skills', label:LANG.sections.skills, count:skills?.length??null, bodyHTML:buildSkillsSection(skills, lang) }));
   initSkillsTable();
+
+  initSortableA11y();
+  buildTOC();
+  initScrollUI();
 }

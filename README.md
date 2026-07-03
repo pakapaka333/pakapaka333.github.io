@@ -75,6 +75,7 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 
 - `is_first_author` / `is_domestic`: `true` / `false`
 - `bibSrc`: リポジトリルートからの相対パス(例: `data/bibtex_first/xxx.bib`)。著者リストはこの BibTeX の `author` フィールドから自動抽出される。
+- **年フィルター**は `period` の先頭4桁から自動生成されるプルダウン(降順)。年数が増えても UI は伸びない。コード変更不要。
 
 ### data/activities.csv
 
@@ -112,6 +113,14 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 | 「読み込み中…」テキスト | 両 HTML の `<main>` 内 | JS がデータを取得する前に表示されるプレースホルダーのため |
 
 運用上は「**氏名・所属・メタ情報を変えるときだけ `index.html` と `en/index.html` を対で grep して更新する**」と覚えておけばよい。それ以外の日常的な更新(業績・活動・スキル・リンク追加)はすべて JSON / CSV の編集だけで完結する。
+
+## デザイン面の挙動メモ
+
+- **テーマ**: 初回訪問時は OS の設定(`prefers-color-scheme`)に従い、ボタンで切り替えると以降はその選択で固定される。選択は `localStorage('theme')` に保存。
+- **目次サイドバー**: セクションから自動生成される黒半透明パネル(見出し "Contents" 付き)。左上の ☰ で開閉し、状態は `localStorage('tocHidden')` に保存。初期状態は画面幅 1400px 以上でのみ表示(狭い画面では本文に重なるため)。
+- **モバイル(768px 以下)**: 全テーブルが「時期 + 内容」の2列に圧縮される。デスクトップの3列目以降(`hide-mobile` クラス)は隠れ、内容は `.td-mobile-meta` として2列目に畳み込まれる。ヘッダーの QR コードはリンクピルに置き換わる。
+- **固定コントロール(JA/EN・テーマ)**: ヘッダーを過ぎてスクロールすると `scrolled` クラスが付き、カード風配色に切り替わる(白背景で読めなくなるのを防ぐ)。
+- **表示行数**: 各テーブルの初期表示は `js/app.js` の `DEFAULT_ROWS`(現在 5)。
 
 ## 画像
 
