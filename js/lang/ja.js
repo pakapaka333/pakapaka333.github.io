@@ -7,6 +7,7 @@ const LANG = {
   organization:'勤め先', role:'役職',
   skill:'スキル', description:'内容',
   all:'すべて', firstOnly:'主著のみ', awardOnly:'受賞あり',
+  allYears:'すべての年', yearFilter:'年で絞り込み',
   domestic:'国内', international:'国際',
   firstAuthor:'主著', coAuthor:'共著', ongoing:'在学中', completed:'修了',
   paper:'論文', slides:'スライド', poster:'ポスター',
@@ -15,5 +16,6 @@ const LANG = {
   remaining: n => `残り ${n} 件`,
   noResults:'該当する研究成果がありません',
   recentContent:'直近のコンテンツ',
+  toc:'目次',
   theme: { switchToDark:'ダークモードに切り替え', switchToLight:'ライトモードに切り替え' },
 };

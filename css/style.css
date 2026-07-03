@@ -16,7 +16,7 @@
   --surface-2:  #f9f8f6;
   --border:     #E6E6E6;
   --text:       #595959;
-  --muted:      #999;
+  --muted:      #757575; /* WCAG AA: 4.6:1 on white */
   --accent:     #3AABD2;
   --accent-lt:  #ddf0f9;
   --award-col:  #DF5656;
@@ -24,6 +24,16 @@
   --header-row: #f8f7f5;
   --radius:     8px;
   --shadow:     0 1px 14px rgba(89,89,89,0.09);
+
+  /* badge / pill border colors (dark で上書きされる) */
+  --accent-bd:   #a8dcf0;
+  --award-bd:    #f5c0c0;
+  --ongoing-bd:  #b8ddb0;
+  --domestic-bd: #cbb8f0;
+  --intl-bd:     #e8d080;
+  --lang-bd:     #a8d4f0;
+  --tech-bd:     #a8d4a8;
+  --dist-bd:     #e8d060;
 }
 
 /* ── Dark Tokens ── */
@@ -33,7 +43,7 @@
   --surface-2:  #2c2a27;
   --border:     #3a3835;
   --text:       #d8d4cf;
-  --muted:      #7a7570;
+  --muted:      #948e88; /* コントラスト改善 */
   --accent:     #4bbde0;
   --accent-lt:  #172f3a;
   --award-col:  #e87070;
@@ -41,6 +51,15 @@
   --header-row: #2a2826;
   --shadow:     0 1px 14px rgba(0,0,0,0.35);
   --stone:      #c0b4ab;
+
+  --accent-bd:   #2a5a70;
+  --award-bd:    #6a3535;
+  --ongoing-bd:  #2a5a35;
+  --domestic-bd: #4a3570;
+  --intl-bd:     #6a5525;
+  --lang-bd:     #2a4a65;
+  --tech-bd:     #2a5030;
+  --dist-bd:     #6a5000;
 }
 
 /* OS-level dark when no manual override */
@@ -51,7 +70,7 @@
     --surface-2:  #2c2a27;
     --border:     #3a3835;
     --text:       #d8d4cf;
-    --muted:      #7a7570;
+    --muted:      #948e88;
     --accent:     #4bbde0;
     --accent-lt:  #172f3a;
     --award-col:  #e87070;
@@ -59,6 +78,15 @@
     --header-row: #2a2826;
     --shadow:     0 1px 14px rgba(0,0,0,0.35);
     --stone:      #c0b4ab;
+
+    --accent-bd:   #2a5a70;
+    --award-bd:    #6a3535;
+    --ongoing-bd:  #2a5a35;
+    --domestic-bd: #4a3570;
+    --intl-bd:     #6a5525;
+    --lang-bd:     #2a4a65;
+    --tech-bd:     #2a5030;
+    --dist-bd:     #6a5000;
   }
 }
 
@@ -68,11 +96,14 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: 'Noto Sans JP', sans-serif;
-  font-weight: 300;
+  font-weight: 400; /* 300 は低解像度で線が痩せるため本文は 400 */
   line-height: 1.75;
   font-size: 14px;
   transition: background 0.25s, color 0.25s;
 }
+
+/* キーボードフォーカスの可視化 */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 
 /* ════════════════════════════════════════════
    FIXED CONTROLS  (top-right)
@@ -106,6 +137,22 @@ body {
 }
 .lang-btn:hover { color: #fff; background: rgba(255,255,255,0.2); }
 .lang-btn.active { background: rgba(255,255,255,0.9); color: #595959; }
+
+/* ── スクロール後(明るいコンテンツの上)はカード風配色に切り替え ──
+   ヘッダー写真の上専用の白系半透明のままだと、白背景に溶けて読めなくなるため */
+.fixed-controls.scrolled .lang-switch {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: var(--shadow);
+}
+.fixed-controls.scrolled .lang-btn { color: var(--muted); }
+.fixed-controls.scrolled .lang-btn:hover { color: var(--text); background: var(--surface-2); }
+.fixed-controls.scrolled .lang-btn.active { background: var(--accent); color: #fff; }
+.fixed-controls.scrolled .theme-toggle {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: var(--shadow);
+}
 
 /* ── Theme toggle: icon-only circle, state shown by fill/icon ──
    Light mode → dark background pill (🌙) → clearly "it's light, click for dark"
@@ -226,6 +273,24 @@ body {
 .filter-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
 .filter-btn:hover:not(.active) { border-color:var(--accent); color:var(--accent); }
 
+/* ── 年フィルターのプルダウン(フィルターピルと同じ見た目) ── */
+.filter-select {
+  font-family:'Noto Sans JP',sans-serif; font-size:12px; font-weight:400;
+  padding:4px 30px 4px 14px; border-radius:20px;
+  border:1px solid var(--border); background-color:var(--surface); color:var(--text);
+  cursor:pointer; transition:all 0.14s;
+  appearance:none; -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23999999' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 12px center;
+}
+.filter-select:hover:not(.active) { border-color:var(--accent); color:var(--accent); }
+.filter-select.active {
+  background-color:var(--accent); border-color:var(--accent); color:#fff;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+/* ドロップダウン内の選択肢はネイティブ描画: ダークでも読めるよう配色を固定 */
+.filter-select option { background:var(--surface); color:var(--text); }
+
 /* ════════════════════════════════════════════
    TABLE
 ════════════════════════════════════════════ */
@@ -273,15 +338,15 @@ td:first-child { padding-left:24px; }
 
 /* ── Badges ── */
 .badge { display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:500; border-radius:4px; padding:2px 8px; margin-top:4px; white-space:nowrap; }
-.badge-award         { background:var(--award-lt); color:var(--award-col); border:1px solid #f5c0c0; }
-.badge-first         { background:var(--accent-lt); color:var(--accent); border:1px solid #a8dcf0; }
+.badge-award         { background:var(--award-lt); color:var(--award-col); border:1px solid var(--award-bd); }
+.badge-first         { background:var(--accent-lt); color:var(--accent); border:1px solid var(--accent-bd); }
 .badge-coauthor      { font-size:11px; color:var(--muted); }
 .badge-status-done   { background:var(--surface-2); color:var(--muted); border:1px solid var(--border); }
-.badge-status-ongoing{ background:#e8f5e9; color:#6aa84f; border:1px solid #b8ddb0; }
-.badge-domestic      { background:#f5f0ff; color:#8060c0; border:1px solid #cbb8f0; }
-.badge-international { background:#fff8e0; color:#a07020; border:1px solid #e8d080; }
-.badge-lang          { background:#e8f4fd; color:#2a7fb0; border:1px solid #a8d4f0; }
-.badge-tech          { background:#edf7ed; color:#3a7a3a; border:1px solid #a8d4a8; }
+.badge-status-ongoing{ background:#e8f5e9; color:#6aa84f; border:1px solid var(--ongoing-bd); }
+.badge-domestic      { background:#f5f0ff; color:#8060c0; border:1px solid var(--domestic-bd); }
+.badge-international { background:#fff8e0; color:#a07020; border:1px solid var(--intl-bd); }
+.badge-lang          { background:#e8f4fd; color:#2a7fb0; border:1px solid var(--lang-bd); }
+.badge-tech          { background:#edf7ed; color:#3a7a3a; border:1px solid var(--tech-bd); }
 .awards-cell { display:flex; flex-direction:column; gap:3px; }
 
 /* dark overrides for colored badges */
@@ -300,14 +365,14 @@ td:first-child { padding-left:24px; }
 
 /* ── Paper Links ── */
 .paper-links { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
-.paper-link { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:400; color:var(--accent); background:var(--accent-lt); border:1px solid #a8dcf0; border-radius:4px; padding:2px 9px; text-decoration:none; transition:background 0.13s, color 0.13s; }
+.paper-link { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:400; color:var(--accent); background:var(--accent-lt); border:1px solid var(--accent-bd); border-radius:4px; padding:2px 9px; text-decoration:none; transition:background 0.13s, color 0.13s; }
 .paper-link:hover { background:var(--accent); color:#fff; }
 .bibtex-btn { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:400; color:var(--muted); background:var(--surface-2); border:1px solid var(--border); border-radius:4px; padding:2px 9px; cursor:pointer; transition:background 0.13s, color 0.13s, border-color 0.13s; font-family:inherit; }
 .bibtex-btn:hover { background:var(--text); color:var(--bg); border-color:var(--text); }
 
 /* ── Table Footer ── */
 .table-footer { display:flex; align-items:center; justify-content:center; padding:10px 24px; border-top:1px solid var(--border); background:var(--surface-2); }
-.expand-btn { font-family:'Noto Sans JP',sans-serif; font-size:12px; font-weight:400; color:var(--accent); background:none; border:1px solid #a8dcf0; border-radius:20px; padding:5px 20px; cursor:pointer; transition:all 0.14s; display:flex; align-items:center; gap:5px; }
+.expand-btn { font-family:'Noto Sans JP',sans-serif; font-size:12px; font-weight:400; color:var(--accent); background:none; border:1px solid var(--accent-bd); border-radius:20px; padding:5px 20px; cursor:pointer; transition:all 0.14s; display:flex; align-items:center; gap:5px; }
 .expand-btn:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
 .row-count { color:var(--muted); font-size:11px; margin-left:4px; }
 
@@ -348,18 +413,90 @@ td:first-child { padding-left:24px; }
 .badge-distinction {
   background: #fffbe6;
   color: #8a6800;
-  border: 1px solid #e8d060;
+  border: 1px solid var(--dist-bd);
 }
 :root[data-theme="dark"] .badge-distinction {
   background: #2a2000;
   color: #e0c040;
-  border-color: #6a5000;
 }
 @media (prefers-color-scheme:dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) .badge-distinction {
-    background:#2a2000; color:#e0c040; border-color:#6a5000;
+    background:#2a2000; color:#e0c040;
   }
 }
+
+/* ════════════════════════════════════════════
+   TOC SIDEBAR  (黒半透明・開閉可能)
+════════════════════════════════════════════ */
+.toc-toggle {
+  position: fixed; top: 14px; left: 16px; z-index: 300;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.55); color: #fff;
+  border: 1px solid rgba(255,255,255,0.35);
+  backdrop-filter: blur(8px);
+  cursor: pointer; font-size: 14px; line-height: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: transform 0.15s, background 0.2s;
+}
+.toc-toggle:hover { transform: scale(1.1); background: rgba(0,0,0,0.7); }
+
+.toc {
+  /* 垂直中央: ページ先頭でもヘッダーの顔写真やコンテンツと重ならない位置 */
+  position: fixed; top: 50%; left: 16px; z-index: 290;
+  transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  max-height: calc(100vh - 80px); overflow-y: auto;
+  transition: transform 0.28s ease, opacity 0.28s ease;
+}
+.toc.toc-hidden { transform: translate(calc(-100% - 24px), -50%); opacity: 0; pointer-events: none; }
+.toc-title {
+  padding: 2px 12px 6px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 13px; letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.92);
+  border-bottom: 1px solid rgba(255,255,255,0.16);
+  margin-bottom: 4px;
+}
+.toc-link {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px; border-radius: 8px;
+  color: rgba(255,255,255,0.75); font-size: 12px;
+  text-decoration: none; white-space: nowrap;
+  transition: background 0.13s, color 0.13s;
+}
+.toc-link:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.toc-link.active { background: rgba(255,255,255,0.16); color: #fff; font-weight: 500; }
+.toc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* ════════════════════════════════════════════
+   SKELETON LOADING
+════════════════════════════════════════════ */
+.skeleton-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 20px 24px; display: flex; flex-direction: column; gap: 14px;
+}
+.sk-bar {
+  height: 12px; border-radius: 6px;
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+.sk-bar.sk-title { width: 30%; height: 16px; }
+.sk-bar.w85 { width: 85%; }
+.sk-bar.w60 { width: 60%; }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .sk-bar { animation: none; } }
+
+/* ── モバイル用メタ情報(デスクトップでは列として表示される内容の畳み込み先) ── */
+.td-mobile-meta { display: none; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
@@ -373,4 +510,32 @@ td:first-child { padding-left:24px; }
   td, thead th { padding-left:14px; }
   td:first-child, thead th:first-child { padding-left:14px; }
   .fixed-controls { gap:6px; }
+
+  /* ヘッダー写真: 縦長画面では下側(街並み)が見えるように調整 */
+  .header-bg { background-position: center 70%; }
+
+  /* QR はスマホでは自分の画面をスキャンできないため隠し、リンクボタンだけにする */
+  .qr-box { display: none; }
+  .qr-item {
+    flex-direction: row; gap: 6px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.32);
+    border-radius: 20px; padding: 5px 14px;
+  }
+  .qr-item::before { content: '🔗'; font-size: 11px; }
+  div.qr-item::before { content: none; } /* リンクなし(divレンダリング)にはアイコン不要 */
+  .qr-type { opacity: 0.92; }
+
+  /* テーブル: 時期 + 内容 の2列に圧縮。3列目以降は .hide-mobile で隠し、
+     内容は app.js が .td-mobile-meta として2列目に畳み込む */
+  .hide-mobile { display: none !important; }
+  .td-mobile-meta { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-top: 7px; align-items: flex-start; }
+  .td-mobile-meta .mm-text { font-size: 12px; color: var(--muted); width: 100%; line-height: 1.5; }
+  .td-mobile-meta .badge { margin-top: 0; }
+  .td-period { min-width: 0; font-size: 11px; }
+  td, thead th { padding-right: 12px; }
+
+  /* 目次はモバイルでは初期状態で閉じる(JS 側で制御) */
+  .toc { left: 12px; }
+  .toc-toggle { top: 12px; left: 12px; }
 }
