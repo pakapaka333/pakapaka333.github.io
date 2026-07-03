@@ -18,7 +18,7 @@ recent_items/         ヘッダーの「直近のコンテンツ」(recent.json 
 data/*.csv            各セクションのデータ
 data/bibtex_first/    主著論文の BibTeX
 data/bibtex_co/       共著論文の BibTeX
-figures/              ヘッダー背景・顔写真・ファビコン
+figures/              ヘッダー背景・顔写真・ファビコン(アルパカアイコン)
 ```
 
 ## 情報と管理場所の対応表
@@ -38,7 +38,7 @@ figures/              ヘッダー背景・顔写真・ファビコン
 | 直近のコンテンツ(QR) | `recent_items/items/recent.json` + `recent_items/qrsrc/` | 自動反映 |
 | UI 文言(見出し・ボタン等) | `js/lang/ja.js` / `js/lang/en.js` | `LANG` オブジェクトを両言語で対で編集 |
 | 画像(顔写真・ヘッダー背景) | `figures/` + パス指定は `css/style.css` のみ | ファイル差し替えのみで両ページに反映 |
-| ファビコン | `figures/favicon.png`(48px) / `apple-touch-icon.png`(180px) | 差し替えのみ。顔写真から生成 |
+| ファビコン(タブのアイコン) | `figures/favicon.svg`(主) / `favicon.png`(48px フォールバック) / `apple-touch-icon.png`(180px) | 差し替えのみ。アルパカアイコン(白塗り＋黒線画)。詳細は下記「ファビコン」節 |
 | ページメタ(title/description/OGP) | ⚠ `index.html` / `en/index.html` に直書き | 両ファイルを手動で対で編集 |
 | サイト URL(canonical/hreflang 等) | ⚠ `index.html` / `en/index.html` に直書き | ドメイン変更時のみ両ファイルを一括置換 |
 | 表の初期表示行数 | `js/app.js` の `DEFAULT_ROWS`(コード定数) | 数値を変更 |
@@ -125,6 +125,30 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 ## 画像
 
 `figures/` の画像は表示サイズに合わせて縮小済み(顔写真 400px、ヘッダー 1600px 幅)。 <br>
-差し替える際も同程度に圧縮すること。ファビコン(`favicon.png` 48px / `apple-touch-icon.png` 180px)は顔写真から生成。
+差し替える際も同程度に圧縮すること。
 
 画像のパス指定は `css/style.css` のみにある(CSS の `url()` はスタイルシートの場所を基準に解決されるため、`en/` 配下のページでも同じ指定で動く)。ファイル名を変えない限り HTML の変更は不要。
+
+## ファビコン(ブラウザタブ / ホーム画面のアイコン)
+
+タブに表示されるアイコンは **アルパカアイコン**(メガネをかけたアルパカの白塗り＋黒線画)。ライト/ダーク両方のタブ背景で視認できるよう白塗り＋黒アウトラインになっている。
+
+`figures/` 内の3ファイルで構成され、両 HTML の `<head>` から参照される:
+
+| ファイル | 用途 | サイズ |
+|---|---|---|
+| `favicon.svg` | 主軸。SVG 対応ブラウザで全サイズ鮮明に表示 | ベクター |
+| `favicon.png` | SVG 非対応の古いブラウザ向けフォールバック | 48px |
+| `apple-touch-icon.png` | iOS のホーム画面追加用 | 180px |
+
+HTML 側の参照(`index.html` / `en/index.html` の `<head>`。SVG → PNG の順でフォールバック):
+
+```html
+<link rel="icon" type="image/svg+xml" href="figures/favicon.svg">
+<link rel="icon" type="image/png" href="figures/favicon.png">
+<link rel="apple-touch-icon" href="figures/apple-touch-icon.png">
+```
+
+**差し替え手順**: 新しいアイコンを用意したら、上記3ファイルを同名で置き換えるだけ(ファイル名を変えなければ HTML の編集は不要)。PNG 2枚は元画像から `sips -Z <px> 元画像.png --out figures/<出力>.png` で生成できる。
+
+> ファビコンはブラウザに強くキャッシュされるため、更新後は Cmd+Shift+R(ハードリロード)かタブの開き直しで反映される。
