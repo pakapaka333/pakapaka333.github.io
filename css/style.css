@@ -34,6 +34,7 @@
   --lang-bd:     #a8d4f0;
   --tech-bd:     #a8d4a8;
   --dist-bd:     #e8d060;
+  --preprint-bd: #c5d0da;
 }
 
 /* ── Dark Tokens ── */
@@ -60,6 +61,7 @@
   --lang-bd:     #2a4a65;
   --tech-bd:     #2a5030;
   --dist-bd:     #6a5000;
+  --preprint-bd: #3d4a56;
 }
 
 /* OS-level dark when no manual override */
@@ -87,6 +89,7 @@
     --lang-bd:     #2a4a65;
     --tech-bd:     #2a5030;
     --dist-bd:     #6a5000;
+    --preprint-bd: #3d4a56;
   }
 }
 
@@ -345,6 +348,7 @@ td:first-child { padding-left:24px; }
 .badge-status-ongoing{ background:#e8f5e9; color:#6aa84f; border:1px solid var(--ongoing-bd); }
 .badge-domestic      { background:#f5f0ff; color:#8060c0; border:1px solid var(--domestic-bd); }
 .badge-international { background:#fff8e0; color:#a07020; border:1px solid var(--intl-bd); }
+.badge-preprint      { background:#eef1f5; color:#5a6b7a; border:1px solid var(--preprint-bd); }
 .badge-lang          { background:#e8f4fd; color:#2a7fb0; border:1px solid var(--lang-bd); }
 .badge-tech          { background:#edf7ed; color:#3a7a3a; border:1px solid var(--tech-bd); }
 .awards-cell { display:flex; flex-direction:column; gap:3px; }
@@ -353,12 +357,14 @@ td:first-child { padding-left:24px; }
 :root[data-theme="dark"] .badge-status-ongoing { background:#1a3020; }
 :root[data-theme="dark"] .badge-domestic       { background:#2a1840; }
 :root[data-theme="dark"] .badge-international  { background:#2a2010; }
+:root[data-theme="dark"] .badge-preprint       { background:#232a30; }
 :root[data-theme="dark"] .badge-lang           { background:#10283a; }
 :root[data-theme="dark"] .badge-tech           { background:#102010; }
 @media (prefers-color-scheme:dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) .badge-status-ongoing { background:#1a3020; }
   :root:not([data-theme="light"]):not([data-theme="dark"]) .badge-domestic       { background:#2a1840; }
   :root:not([data-theme="light"]):not([data-theme="dark"]) .badge-international  { background:#2a2010; }
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .badge-preprint       { background:#232a30; }
   :root:not([data-theme="light"]):not([data-theme="dark"]) .badge-lang           { background:#10283a; }
   :root:not([data-theme="light"]):not([data-theme="dark"]) .badge-tech           { background:#102010; }
 }

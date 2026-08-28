@@ -1,6 +1,10 @@
-skill,skill_en,description,description_en,category,category_en
-TOEIC,TOEIC,910,910,語学,Language
-TOEFL-iBT,TOEFL-iBT,97 (MyBestScores),97 (MyBestScores),語学,Language
-英検,Eiken,準一級,Pre-1st Grade,語学,Language
-漢検,Kanken,二級,Grade 2,語学,Language
-基本情報技術者,FE Exam (Japan),合格,Passed,技術,Technical
+skill,skill_en,description,description_en,category,category_en,period,in_cv
+Python,Python,NLP・機械学習 (LLMの学習・評価),NLP / ML (LLM training and evaluation),技術,Technical,2021 -,true
+PyTorch / Hugging Face Transformers,PyTorch / Hugging Face Transformers,LLMの学習・ファインチューニング・評価,"LLM training, fine-tuning, and evaluation",技術,Technical,2022 -,true
+HPC / GPUクラスタ,HPC / GPU clusters,GPUスパコンでのLLM大規模評価 (TSUBAME・ABCI),"large-scale LLM evaluation on GPU supercomputers (TSUBAME, ABCI)",技術,Technical,2024 -,true
+LLM API (OpenAI APIなど),"LLM APIs (OpenAI API, etc.)",ファインチューニング・バッチ推論・エージェント・RAG,"fine-tuning, batch inference, agents, RAG",技術,Technical,2023 -,true
+TOEFL-iBT,TOEFL-iBT,97 (MyBestScores),97 (MyBestScores),語学,Language,2024/4,true
+TOEIC,TOEIC,910,910,語学,Language,2023/2,true
+英検,Eiken,準一級,Pre-1st Grade,語学,Language,,false
+基本情報技術者,FE Exam (Japan),合格,Passed,技術,Technical,,false
+漢検,Kanken,二級,Grade 2,語学,Language,,false

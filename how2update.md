@@ -16,6 +16,7 @@ js/lang/{ja,en}.js    UI 文言(LANG オブジェクト)
 profile/profile.json  名前・所属・SNS リンク
 recent_items/         ヘッダーの「直近のコンテンツ」(recent.json + QR 画像)
 data/*.csv            各セクションのデータ
+data/name_map.json    BibTeX 著者名 → 英語表記の対応表(英語ページと CV generator が共用)
 data/bibtex_first/    主著論文の BibTeX
 data/bibtex_co/       共著論文の BibTeX
 figures/              ヘッダー背景・顔写真・ファビコン(アルパカアイコン)
@@ -31,6 +32,7 @@ figures/              ヘッダー背景・顔写真・ファビコン(アルパ
 | 所属・肩書 | `profile/profile.json` の `affiliations_ja` / `affiliations_en` | ヘッダーのタグ表示に自動反映。⚠ noscript・JSON-LD の `affiliation` は手動 |
 | SNS・外部プロフィール URL | `profile/profile.json` の `links` 配列 | SNS ボタンと JSON-LD `sameAs` に自動反映(下記参照)。⚠ noscript 内 Scholar リンクのみ手動 |
 | 研究業績 | `data/research_history.csv` + `data/bibtex_*/` | 自動反映。著者リストは BibTeX から自動抽出 |
+| 著者名の英語表記 | `data/name_map.json` | 英語ページで日本語の著者名を英語表記に置換。CV generator(`~/lab/CV`)も同じファイルを参照 |
 | 対外活動 | `data/activities.csv` | 自動反映 |
 | 学歴 | `data/education_history.csv` | 自動反映 |
 | 職歴 | `data/business_history.csv` | 自動反映 |
@@ -75,6 +77,7 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 
 - `is_first_author` / `is_domestic`: `true` / `false`
 - `bibSrc`: リポジトリルートからの相対パス(例: `data/bibtex_first/xxx.bib`)。著者リストはこの BibTeX の `author` フィールドから自動抽出される。
+- **日本語名の共著者が増えたら** `data/name_map.json` にローマ字表記を追加する(英語ページと CV の両方が参照)。
 - **年フィルター**は `period` の先頭4桁から自動生成されるプルダウン(降順)。年数が増えても UI は伸びない。コード変更不要。
 
 ### data/activities.csv
@@ -91,9 +94,12 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 
 ### data/skills.csv
 
-`skill, skill_en, description, description_en, category, category_en`
+`skill, skill_en, description, description_en, category, category_en, period, in_cv`
 
 - カテゴリは CSV から動的に収集され、**新しいカテゴリは CSV に書くだけ**でフィルタボタンが増える(コード変更不要)。
+- `period` は取得時期・使用期間(`2023/2` や `2021 -` 形式)。サイトの表には現状表示されず、CV generator が Skills の日付欄に使う。
+- `in_cv` を `false` にするとサイトには表示されるが CV には載らない(国内向け資格など)。空欄・`true` は CV に載る。
+- **行順がそのまま表示順**(サイト・CV とも)。重要なスキルを上に置く。
 - バッジの色を分けたい場合のみ `app.js` の `SKILL_BADGE_CLASS` にカテゴリ名 → CSS クラスの対応を追加する(未登録カテゴリは `badge-tech` の緑になる)。
 
 ### recent_items/items/recent.json
