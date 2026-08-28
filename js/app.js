@@ -58,7 +58,7 @@ async function fetchBibtex(bibSrc) {
   _bibtexCache[bibSrc] = text;
   return text;
 }
-function extractAuthors(bibtex) {
+function extractAuthors(bibtex, nameMap) {
   if (!bibtex) return null;
   const m = bibtex.match(/author\s*=\s*[{"]([\s\S]*?)["}]\s*[,}]/i);
   if (!m) return null;
@@ -68,9 +68,10 @@ function extractAuthors(bibtex) {
       a = a.trim();
       if (a.includes(',')) {
         const [last, first] = a.split(',').map(s => s.trim());
-        return first ? `${first} ${last}` : last;
+        a = first ? `${first} ${last}` : last;
       }
-      return a;
+      // nameMap (data/name_map.json): EN ページでは日本語の著者名を英語表記に置き換える
+      return nameMap?.[a] ?? a;
     })
     .join(', ');
 }
@@ -344,7 +345,7 @@ function makeSection({ id, dotClass, label, count, bodyHTML }) {
 ════════════════════════════════════════════ */
 
 /* ── Research ── */
-async function buildResearchSection(data, lang, dataRoot) {
+async function buildResearchSection(data, lang, dataRoot, nameMap) {
   if (!data) return `<div class="empty-state">⚠ data/research_history.csv not found</div>`;
 
   const bibtexTexts = await Promise.all(
@@ -352,7 +353,7 @@ async function buildResearchSection(data, lang, dataRoot) {
   );
   data.forEach((r, i) => {
     r._bibtex = bibtexTexts[i];
-    r._authors = extractAuthors(bibtexTexts[i]);
+    r._authors = extractAuthors(bibtexTexts[i], lang === 'en' ? nameMap : null);
   });
 
   // 年フィルター: データの period から自動生成(降順)。
@@ -363,6 +364,7 @@ async function buildResearchSection(data, lang, dataRoot) {
     <button class="filter-btn active" data-filter="all">${LANG.all}</button>
     <button class="filter-btn" data-filter="first">${LANG.firstOnly}</button>
     <button class="filter-btn" data-filter="award">${LANG.awardOnly}</button>
+    <button class="filter-btn" data-filter="reviewed">${LANG.reviewedOnly}</button>
     <div class="filter-separator"></div>
     <button class="filter-btn" data-filter="domestic">${LANG.domestic}</button>
     <button class="filter-btn" data-filter="international">${LANG.international}</button>
@@ -377,6 +379,8 @@ async function buildResearchSection(data, lang, dataRoot) {
     const isFirst    = (r.is_first_author ?? '').trim() === 'true';
     const hasAward   = r.award && r.award.trim() !== '';
     const isDomestic = (r.is_domestic ?? '').trim() === 'true';
+    const isReviewed = (r.is_reviewed ?? '').trim() === 'true';
+    const isPreprint = (r.venue_type ?? '').trim() === 'preprint';
     const hasBib     = !!r._bibtex;
     const title      = field(r, 'title', lang);
     const venue      = field(r, 'venue', lang);
@@ -401,15 +405,19 @@ async function buildResearchSection(data, lang, dataRoot) {
     // モバイルでは著者区分・受賞を2列目に畳み込む(デスクトップでは非表示)
     const mobileMeta = `<div class="td-mobile-meta">${authorBadge}${hasAward ? renderAwards(awardStr) : ''}</div>`;
 
+    const venueBadge = isPreprint
+      ? `<span class="badge badge-preprint" style="margin-top:0;margin-right:4px;">${LANG.preprint}</span>`
+      : `<span class="badge ${isDomestic ? 'badge-domestic' : 'badge-international'}" style="margin-top:0;margin-right:4px;">${isDomestic ? LANG.domestic : LANG.international}</span>`;
+
     return `<tr class="research-row"
         data-period="${periodToDate(r.period)}" data-year="${(r.period?.match(/^(\d{4})/) || [])[1] ?? ''}"
-        data-first="${isFirst}" data-award="${hasAward}" data-domestic="${isDomestic}">
+        data-first="${isFirst}" data-award="${hasAward}" data-domestic="${isDomestic}" data-reviewed="${isReviewed}">
       <td class="td-period">${r.period}</td>
       <td>
         <div class="td-main">${title}</div>
         ${authHtml}
         <div class="td-venue">
-          <span class="badge ${isDomestic ? 'badge-domestic' : 'badge-international'}" style="margin-top:0;margin-right:4px;">${isDomestic ? LANG.domestic : LANG.international}</span>
+          ${venueBadge}
           ${venueHtml}
         </div>
         ${links.length ? `<div class="paper-links">${links.join('')}</div>` : ''}
@@ -499,6 +507,7 @@ function applyResearchFilter(activeFilters, onDone) {
     let show = true;
     if (activeFilters.has('first')         && tr.dataset.first    !== 'true') show = false;
     if (activeFilters.has('award')         && tr.dataset.award    !== 'true') show = false;
+    if (activeFilters.has('reviewed')      && tr.dataset.reviewed !== 'true') show = false;
     if (activeFilters.has('domestic')      && tr.dataset.domestic !== 'true') show = false;
     if (activeFilters.has('international') && tr.dataset.domestic === 'true') show = false;
     if (activeYear && `year-${tr.dataset.year}` !== activeYear) show = false;
@@ -800,7 +809,7 @@ function initSortableA11y() {
 async function initPage(lang, dataRoot) {
   _updateToggleUI(_resolveTheme());
 
-  const [profile, recentItems, business, education, research, activities, skills] = await Promise.all([
+  const [profile, recentItems, business, education, research, activities, skills, nameMap] = await Promise.all([
     loadJSON(dataRoot + 'profile/profile.json'),
     loadJSON(dataRoot + 'recent_items/items/recent.json'),
     loadCSV(dataRoot + 'data/business_history.csv'),
@@ -808,6 +817,7 @@ async function initPage(lang, dataRoot) {
     loadCSV(dataRoot + 'data/research_history.csv'),
     loadCSV(dataRoot + 'data/activities.csv'),
     loadCSV(dataRoot + 'data/skills.csv'),
+    loadJSON(dataRoot + 'data/name_map.json'),
   ]);
 
   renderProfile(profile, lang);
@@ -816,7 +826,7 @@ async function initPage(lang, dataRoot) {
   const main = document.getElementById('mainContent');
   main.innerHTML = '';
 
-  const researchHTML = await buildResearchSection(research, lang, dataRoot);
+  const researchHTML = await buildResearchSection(research, lang, dataRoot, nameMap);
   const researchCard = makeSection({ id:'sec-research', dotClass:'dot-research', label:LANG.sections.research, count:research?.length??null, bodyHTML:researchHTML });
   main.appendChild(researchCard);
   initResearchTable(research);
