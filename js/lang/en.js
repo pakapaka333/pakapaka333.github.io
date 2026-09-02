@@ -10,7 +10,7 @@ const LANG = {
   allYears:'All years', yearFilter:'Filter by year',
   domestic:'Domestic', international:'International', preprint:'Preprint',
   firstAuthor:'1st Author', coAuthor:'Co-author', ongoing:'Ongoing', completed:'Completed',
-  paper:'Paper', slides:'Slides', poster:'Poster',
+  paper:'Paper', slides:'Slides', poster:'Poster', implementation:'Code',
   copy:'Copy', copied:'Copied ✓',
   expand:'Show more', collapse:'Collapse',
   remaining: n => `+${n} more`,

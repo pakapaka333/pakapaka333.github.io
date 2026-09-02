@@ -73,9 +73,10 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 
 ### data/research_history.csv
 
-`period, title, title_en, venue, venue_en, venue_link, venue_type, paper_link, slide_link, poster_link, award, award_en, is_first_author, is_domestic, bibSrc`
+`period, title, title_en, venue, venue_en, venue_link, venue_type, paper_link, slide_link, poster_link, implementation, award, award_en, is_first_author, is_domestic, is_reviewed, bibSrc`
 
-- `is_first_author` / `is_domestic`: `true` / `false`
+- `is_first_author` / `is_domestic` / `is_reviewed`: `true` / `false`
+- `implementation`: 実装を公開している場合の URL(GitHub リポジトリ、Hugging Face など)。空欄ならリンクは表示されない。
 - `bibSrc`: リポジトリルートからの相対パス(例: `data/bibtex_first/xxx.bib`)。著者リストはこの BibTeX の `author` フィールドから自動抽出される。
 - **日本語名の共著者が増えたら** `data/name_map.json` にローマ字表記を追加する(英語ページと CV の両方が参照)。
 - **年フィルター**は `period` の先頭4桁から自動生成されるプルダウン(降順)。年数が増えても UI は伸びない。コード変更不要。

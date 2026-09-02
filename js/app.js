@@ -392,6 +392,7 @@ async function buildResearchSection(data, lang, dataRoot, nameMap) {
     if (r.paper_link)  links.push(`<a class="paper-link" href="${r.paper_link}"  target="_blank" rel="noopener">📄 ${LANG.paper}</a>`);
     if (r.slide_link)  links.push(`<a class="paper-link" href="${r.slide_link}"  target="_blank" rel="noopener">🖥 ${LANG.slides}</a>`);
     if (r.poster_link) links.push(`<a class="paper-link" href="${r.poster_link}" target="_blank" rel="noopener">🗂 ${LANG.poster}</a>`);
+    if (r.implementation) links.push(`<a class="paper-link" href="${r.implementation}" target="_blank" rel="noopener">💻 ${LANG.implementation}</a>`);
     if (hasBib)        links.push(`<button class="bibtex-btn" data-bib-idx="${idx}">{ } BibTeX</button>`);
 
     const aId = `auth-${idx}`;
