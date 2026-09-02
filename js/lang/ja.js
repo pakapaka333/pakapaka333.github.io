@@ -10,7 +10,7 @@ const LANG = {
   allYears:'すべての年', yearFilter:'年で絞り込み',
   domestic:'国内', international:'国際', preprint:'プレプリント',
   firstAuthor:'主著', coAuthor:'共著', ongoing:'在学中', completed:'修了',
-  paper:'論文', slides:'スライド', poster:'ポスター',
+  paper:'論文', slides:'スライド', poster:'ポスター', implementation:'実装',
   copy:'コピー', copied:'コピー済み ✓',
   expand:'展開', collapse:'折りたたむ',
   remaining: n => `残り ${n} 件`,
