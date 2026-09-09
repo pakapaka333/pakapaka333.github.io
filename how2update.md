@@ -16,9 +16,9 @@ js/lang/{ja,en}.js    UI 文言(LANG オブジェクト)
 profile/profile.json  名前・所属・SNS リンク
 recent_items/         ヘッダーの「直近のコンテンツ」(recent.json + QR 画像)
 data/*.csv            各セクションのデータ
-data/name_map.json    BibTeX 著者名 → 英語表記の対応表(英語ページと CV generator が共用)
-data/bibtex_first/    主著論文の BibTeX
-data/bibtex_co/       共著論文の BibTeX
+data/name_map.json    日本語名 → ローマ字表記の対応表(_en.bib の執筆時と CV generator が参照)
+data/bibtex_first/    主著論文の BibTeX(日本語発表は xxx.bib と xxx_en.bib の対)
+data/bibtex_co/       共著論文の BibTeX(同上)
 figures/              ヘッダー背景・顔写真・ファビコン(アルパカアイコン)
 ```
 
@@ -32,7 +32,8 @@ figures/              ヘッダー背景・顔写真・ファビコン(アルパ
 | 所属・肩書 | `profile/profile.json` の `affiliations_ja` / `affiliations_en` | ヘッダーのタグ表示に自動反映。⚠ noscript・JSON-LD の `affiliation` は手動 |
 | SNS・外部プロフィール URL | `profile/profile.json` の `links` 配列 | SNS ボタンと JSON-LD `sameAs` に自動反映(下記参照)。⚠ noscript 内 Scholar リンクのみ手動 |
 | 研究業績 | `data/research_history.csv` + `data/bibtex_*/` | 自動反映。著者リストは BibTeX から自動抽出 |
-| 著者名の英語表記 | `data/name_map.json` | 英語ページで日本語の著者名を英語表記に置換。CV generator(`~/lab/CV`)も同じファイルを参照 |
+| BibTeX の言語 | `data/bibtex_*/xxx.bib`(原語) + `xxx_en.bib`(英訳) | 日本語発表のみ英訳版を用意する。詳細は下記 |
+| 著者名のローマ字表記 | `data/name_map.json` | サイトは実行時に参照しない(表示は bib のとおり)。`xxx_en.bib` を書くときの typo 防止用の辞書で、CV generator(`~/lab/CV`)も同じファイルを参照 |
 | 対外活動 | `data/activities.csv` | 自動反映 |
 | 学歴 | `data/education_history.csv` | 自動反映 |
 | 職歴 | `data/business_history.csv` | 自動反映 |
@@ -73,12 +74,47 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 
 ### data/research_history.csv
 
-`period, title, title_en, venue, venue_en, venue_link, venue_type, paper_link, slide_link, poster_link, implementation, award, award_en, is_first_author, is_domestic, is_reviewed, bibSrc`
+`period, title, title_en, venue, venue_en, venue_link, venue_type, paper_link, slide_link, poster_link, implementation, award, award_en, is_first_author, is_domestic, is_reviewed, bibSrc, bibSrc_en`
 
 - `is_first_author` / `is_domestic` / `is_reviewed`: `true` / `false`
 - `implementation`: 実装を公開している場合の URL(GitHub リポジトリ、Hugging Face など)。空欄ならリンクは表示されない。
-- `bibSrc`: リポジトリルートからの相対パス(例: `data/bibtex_first/xxx.bib`)。著者リストはこの BibTeX の `author` フィールドから自動抽出される。
-- **日本語名の共著者が増えたら** `data/name_map.json` にローマ字表記を追加する(英語ページと CV の両方が参照)。
+- `bibSrc` / `bibSrc_en`: リポジトリルートからの相対パス(例: `data/bibtex_first/xxx.bib`)。著者リストはこの BibTeX の `author` フィールドから自動抽出され、`{ } BibTeX` ボタンの中身にもなる。**言語の扱いは下記「BibTeX の言語」を参照**。
+- **日本語名の共著者が増えたら** `data/name_map.json` にローマ字表記を追加する(`_en.bib` の執筆時と CV が参照)。
+
+#### BibTeX の言語
+
+**方針: 業績を発表した言語の bib を原本とし、日本語発表にだけ英訳版を添える。**
+
+サイトに表示される著者名は **bib に書いてあるとおり**で、実行時の名前変換は一切ない(著者リストも `{ } BibTeX` の中身も、下表で選ばれた同じ 1 ファイルから来る)。したがって英語表記を直したいときは **bib 本体を直す**。
+
+| 発表言語 | `bibSrc` | `bibSrc_en` | JA ページ | EN ページ |
+|---|---|---|---|---|
+| 英語(国際会議・arXiv) | `xxx.bib`(英語) | **空欄** | 英語 | 英語(`bibSrc` にフォールバック) |
+| 日本語(NLP・YANS・NL研・FIT) | `xxx.bib`(日本語) | `xxx_en.bib` | 日本語 | 英語 |
+
+`_en` が空なら無印にフォールバックする `field()` の仕組み(共通ルール参照)をそのまま使っているので、**英語で発表したものは `bibSrc_en` を空欄にするだけでよい**。
+
+**日本語発表を追加するときの手順**:
+
+1. 原語の `xxx.bib` を書く(著者名は日本語のまま)。
+2. `data/name_map.json` に未登録の共著者がいれば、ローマ字表記を追加する。
+3. `xxx_en.bib` を作る。→ **既存の `*_en.bib` が実例なので、Claude に「これに倣って英訳版を作って」と頼めばよい**。既存ファイルから読み取れる規約は次のとおり:
+   - 引用キー・`year`・`pages`・`url` は日本語版と**同一**にする(同じ業績を指すため)。
+   - 差し替えるのは `title` / `author` / `booktitle` の3フィールドだけ。
+   - `title` は CSV の `title_en` と同じ文字列。`LLM` などの略語は `{LLM}` と波括弧で囲んで大文字を保護する。
+   - `author` は `name_map.json` のローマ字表記。
+4. CSV の `bibSrc_en` にパスを書く。
+
+**既存ファイルから読み取れないのは学会の正式英語名だけ**なので、そこはこの表を参照する。新しい学会に出したら1行足しておくこと。
+
+| 学会 | `booktitle`(英語) |
+|---|---|
+| 言語処理学会 第N回年次大会 | `Proceedings of the Nth Annual Meeting of the Association for Natural Language Processing (NLPyyyy)` |
+| YANS(言語処理若手シンポジウム) | `The Nth Symposium of the Young Researcher Association for NLP Studies (YANSyyyy)` — 回次は 2024=19th / 2025=20th / 2026=21st |
+| FIT(情報科学技術フォーラム) | `The Nth Forum on Information Technology (FITyyyy)` |
+| 情報処理学会 研究報告(NL 研) | `IPSJ SIG Technical Report, Natural Language Processing (NL)` |
+
+> `data/bibtex_*/` を `*.bib` でグロブすると `xxx.bib` と `xxx_en.bib` を二重に拾う。外部ツール(CV generator など)から読むときは、必ず CSV の `bibSrc` / `bibSrc_en` を見て開くこと。
 - **年フィルター**は `period` の先頭4桁から自動生成されるプルダウン(降順)。年数が増えても UI は伸びない。コード変更不要。
 
 ### data/activities.csv
