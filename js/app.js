@@ -58,7 +58,9 @@ async function fetchBibtex(bibSrc) {
   _bibtexCache[bibSrc] = text;
   return text;
 }
-function extractAuthors(bibtex, nameMap) {
+// 著者名は bib に書いてあるものをそのまま表示する。日本語発表の英語表記は
+// bibSrc_en (data/*/xxx_en.bib) 側で解決済みなので、ここでの名前変換は行わない。
+function extractAuthors(bibtex) {
   if (!bibtex) return null;
   const m = bibtex.match(/author\s*=\s*[{"]([\s\S]*?)["}]\s*[,}]/i);
   if (!m) return null;
@@ -70,8 +72,7 @@ function extractAuthors(bibtex, nameMap) {
         const [last, first] = a.split(',').map(s => s.trim());
         a = first ? `${first} ${last}` : last;
       }
-      // nameMap (data/name_map.json): EN ページでは日本語の著者名を英語表記に置き換える
-      return nameMap?.[a] ?? a;
+      return a;
     })
     .join(', ');
 }
@@ -345,15 +346,17 @@ function makeSection({ id, dotClass, label, count, bodyHTML }) {
 ════════════════════════════════════════════ */
 
 /* ── Research ── */
-async function buildResearchSection(data, lang, dataRoot, nameMap) {
+async function buildResearchSection(data, lang, dataRoot) {
   if (!data) return `<div class="empty-state">⚠ data/research_history.csv not found</div>`;
 
+  // bibSrc_en: 日本語で発表した業績の英訳 BibTeX。空なら bibSrc(元から英語のもの)にフォールバックする。
+  // 著者リストと BibTeX ボタンの中身は、どちらもここで選んだ 1 ファイルから来る。
   const bibtexTexts = await Promise.all(
-    data.map(r => fetchBibtex(r.bibSrc ? (dataRoot + r.bibSrc) : ''))
+    data.map(r => { const src = field(r, 'bibSrc', lang); return fetchBibtex(src ? (dataRoot + src) : ''); })
   );
   data.forEach((r, i) => {
     r._bibtex = bibtexTexts[i];
-    r._authors = extractAuthors(bibtexTexts[i], lang === 'en' ? nameMap : null);
+    r._authors = extractAuthors(bibtexTexts[i]);
   });
 
   // 年フィルター: データの period から自動生成(降順)。
@@ -810,7 +813,7 @@ function initSortableA11y() {
 async function initPage(lang, dataRoot) {
   _updateToggleUI(_resolveTheme());
 
-  const [profile, recentItems, business, education, research, activities, skills, nameMap] = await Promise.all([
+  const [profile, recentItems, business, education, research, activities, skills] = await Promise.all([
     loadJSON(dataRoot + 'profile/profile.json'),
     loadJSON(dataRoot + 'recent_items/items/recent.json'),
     loadCSV(dataRoot + 'data/business_history.csv'),
@@ -818,7 +821,6 @@ async function initPage(lang, dataRoot) {
     loadCSV(dataRoot + 'data/research_history.csv'),
     loadCSV(dataRoot + 'data/activities.csv'),
     loadCSV(dataRoot + 'data/skills.csv'),
-    loadJSON(dataRoot + 'data/name_map.json'),
   ]);
 
   renderProfile(profile, lang);
@@ -827,7 +829,7 @@ async function initPage(lang, dataRoot) {
   const main = document.getElementById('mainContent');
   main.innerHTML = '';
 
-  const researchHTML = await buildResearchSection(research, lang, dataRoot, nameMap);
+  const researchHTML = await buildResearchSection(research, lang, dataRoot);
   const researchCard = makeSection({ id:'sec-research', dotClass:'dot-research', label:LANG.sections.research, count:research?.length??null, bodyHTML:researchHTML });
   main.appendChild(researchCard);
   initResearchTable(research);
