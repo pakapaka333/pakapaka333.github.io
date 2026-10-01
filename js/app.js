@@ -16,7 +16,28 @@ function field(row, key, lang) {
 /* ── linkWrap(text, url): wrap text in <a> if url present ── */
 function linkWrap(text, url) {
   if (!url || !url.trim()) return text;
+  url = url.trim();
+  if (url.startsWith('#')) return `<a href="${url}" class="td-link">${text}</a>`;
   return `<a href="${url}" target="_blank" rel="noopener" class="td-link">${text}</a>`;
+}
+
+/* ── ページ内リンク(href="#sec-xxx")のクリック処理 ──
+   折りたたまれたセクションなら展開してからスクロールする。 */
+function initInPageLinks() {
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a || a.classList.contains('toc-link')) return;
+    const target = document.getElementById(a.getAttribute('href').slice(1));
+    if (!target) return;
+    e.preventDefault();
+    if (target.classList.contains('collapsed')) {
+      target.classList.remove('collapsed');
+      target.querySelector('.section-header')?.setAttribute('aria-expanded', 'true');
+    }
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    history.replaceState(null, '', a.getAttribute('href'));
+  });
 }
 
 /* ── Data loaders ── */
@@ -925,5 +946,6 @@ async function initPage(lang, dataRoot) {
 
   initSortableA11y();
   buildTOC();
+  initInPageLinks();
   initScrollUI();
 }
