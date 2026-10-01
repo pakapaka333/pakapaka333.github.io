@@ -35,6 +35,7 @@ figures/              ヘッダー背景・顔写真・ファビコン(アルパ
 | BibTeX の言語 | `data/bibtex_*/xxx.bib`(原語) + `xxx_en.bib`(英訳) | 日本語発表のみ英訳版を用意する。詳細は下記 |
 | 著者名のローマ字表記 | `data/name_map.json` | サイトは実行時に参照しない(表示は bib のとおり)。`xxx_en.bib` を書くときの typo 防止用の辞書で、CV generator(`~/lab/CV`)も同じファイルを参照 |
 | 対外活動 | `data/activities.csv` | 自動反映 |
+| 助成・奨学金 | `data/grants.csv` | 自動反映 |
 | 学歴 | `data/education_history.csv` | 自動反映 |
 | 職歴 | `data/business_history.csv` | 自動反映 |
 | スキル(カテゴリ含む) | `data/skills.csv` | 自動反映。カテゴリのフィルタボタンも CSV から動的生成 |
@@ -120,6 +121,12 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 ### data/activities.csv
 
 `period, title, title_en, details, details_en, link, award, award_en`
+
+### data/grants.csv
+
+`period, title, title_en, organization, organization_en, details, details_en, link`
+
+奨学金・フェローシップ・研究助成など資金面の支援をまとめる（見出しは両言語とも "Grants & Fellowships"）。受賞は研究業績・対外活動の `award` 列に書き、ここには入れない。
 
 ### data/education_history.csv
 

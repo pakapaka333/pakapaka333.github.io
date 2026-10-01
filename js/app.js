@@ -575,6 +575,53 @@ function initActivitiesTable() {
   });
 }
 
+/* ── Grants & Fellowships ──
+   CSV columns: period, title, title_en, organization, organization_en, details, details_en, link
+   奨学金・フェローシップ・研究助成など。"link" は title にハイパーリンクを付ける。
+*/
+function buildGrantsSection(data, lang) {
+  if (!data) return `<div class="empty-state">⚠ data/grants.csv not found</div>`;
+  const rows = data.map(r => {
+    const title   = field(r, 'title',        lang);
+    const org     = field(r, 'organization', lang);
+    const details = field(r, 'details',      lang);
+    const titleHtml = linkWrap(title, r.link);
+    const mobileMeta = `<div class="td-mobile-meta">${org ? `<span class="mm-text">${org}</span>` : ''}${details ? `<span class="mm-text">${details}</span>` : ''}</div>`;
+    return `<tr class="grant-row" data-period="${periodToDate(r.period)}" data-org="${org}">
+      <td class="td-period">${r.period}</td>
+      <td><div class="td-main">${titleHtml}</div>${mobileMeta}</td>
+      <td class="td-sub hide-mobile" style="color:var(--text);">${org}</td>
+      <td class="td-sub hide-mobile" style="color:var(--text);">${details}</td>
+    </tr>`;
+  }).join('');
+  return `<div class="table-wrap"><table id="grantsTable">
+    <thead><tr>
+      <th class="sortable">${LANG.period}</th>
+      <th>${LANG.title}</th>
+      <th class="sortable hide-mobile">${LANG.grantOrg}</th>
+      <th class="hide-mobile">${LANG.details}</th>
+    </tr></thead>
+    <tbody id="grantsBody">${rows}</tbody>
+  </table></div>`;
+}
+function initGrantsTable() {
+  const tbody = document.getElementById('grantsBody');
+  const thead = document.querySelector('#grantsTable thead');
+  const sortState = { col: -1, dir: 'asc' };
+  const getVisibleRows = () => Array.from(tbody.querySelectorAll('tr.grant-row'));
+  const sec = document.getElementById('sec-grants');
+  const footer = makeExpandFooter('grantsFooter', () => applyRowLimit(tbody, footer, getVisibleRows));
+  sec.querySelector('.table-wrap').after(footer);
+  const reapply = () => applyRowLimit(tbody, footer, getVisibleRows);
+  const getters = { 0: tr => parseInt(tr.dataset.period || '0'), 2: tr => tr.dataset.org || '' };
+  sortTable(tbody, 0, getters[0], sortState, reapply);
+  updateSortIndicators(thead, sortState); reapply();
+  thead.querySelectorAll('th.sortable').forEach((th) => {
+    const idx = Array.from(th.parentNode.children).indexOf(th);
+    th.addEventListener('click', () => { sortTable(tbody, idx, getters[idx], sortState, reapply); updateSortIndicators(thead, sortState); });
+  });
+}
+
 /* ── Education ──
    CSV columns: ..., distinction, distinction_en
    "distinction" = valedictorian / salutatorian / honours etc.
@@ -813,13 +860,14 @@ function initSortableA11y() {
 async function initPage(lang, dataRoot) {
   _updateToggleUI(_resolveTheme());
 
-  const [profile, recentItems, business, education, research, activities, skills] = await Promise.all([
+  const [profile, recentItems, business, education, research, activities, grants, skills] = await Promise.all([
     loadJSON(dataRoot + 'profile/profile.json'),
     loadJSON(dataRoot + 'recent_items/items/recent.json'),
     loadCSV(dataRoot + 'data/business_history.csv'),
     loadCSV(dataRoot + 'data/education_history.csv'),
     loadCSV(dataRoot + 'data/research_history.csv'),
     loadCSV(dataRoot + 'data/activities.csv'),
+    loadCSV(dataRoot + 'data/grants.csv'),
     loadCSV(dataRoot + 'data/skills.csv'),
   ]);
 
@@ -836,6 +884,9 @@ async function initPage(lang, dataRoot) {
 
   main.appendChild(makeSection({ id:'sec-activities', dotClass:'dot-activities', label:LANG.sections.activities, count:activities?.length??null, bodyHTML:buildActivitiesSection(activities, lang) }));
   initActivitiesTable();
+
+  main.appendChild(makeSection({ id:'sec-grants', dotClass:'dot-grants', label:LANG.sections.grants, count:grants?.length??null, bodyHTML:buildGrantsSection(grants, lang) }));
+  initGrantsTable();
 
   main.appendChild(makeSection({ id:'sec-education', dotClass:'dot-education', label:LANG.sections.education, count:education?.length??null, bodyHTML:buildEducationSection(education, lang) }));
   initEducationTable();

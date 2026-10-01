@@ -1,10 +1,10 @@
 /* lang/ja.js */
 const LANG = {
-  sections: { research:'Research', activities:'Activities', education:'Education', business:'Business', skills:'Skills' },
+  sections: { research:'Research', activities:'Activities', grants:'Grants & Fellowships', education:'Education', business:'Business', skills:'Skills' },
   period:'時期', titleVenue:'題名 / 大会', authors:'著者', award:'受賞',
   title:'タイトル', details:'詳細',
   school:'学校名', department:'学部・専攻', degreeStatus:'学位 / 状態',
-  organization:'勤め先', role:'役職',
+  organization:'勤め先', grantOrg:'団体', role:'役職',
   skill:'スキル', description:'内容',
   all:'すべて', firstOnly:'主著のみ', awardOnly:'受賞あり', reviewedOnly:'査読あり',
   allYears:'すべての年', yearFilter:'年で絞り込み',

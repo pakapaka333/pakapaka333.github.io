@@ -1,10 +1,10 @@
 /* lang/en.js */
 const LANG = {
-  sections: { research:'Research', activities:'Activities', education:'Education', business:'Business', skills:'Skills' },
+  sections: { research:'Research', activities:'Activities', grants:'Grants & Fellowships', education:'Education', business:'Business', skills:'Skills' },
   period:'Period', titleVenue:'Title / Venue', authors:'Authors', award:'Award',
   title:'Title', details:'Details',
   school:'Institution', department:'Department / Program', degreeStatus:'Degree / Status',
-  organization:'Organization', role:'Role',
+  organization:'Organization', grantOrg:'Organization', role:'Role',
   skill:'Skill', description:'Details',
   all:'All', firstOnly:'1st Author', awardOnly:'Awarded', reviewedOnly:'Peer-reviewed',
   allYears:'All years', yearFilter:'Filter by year',
