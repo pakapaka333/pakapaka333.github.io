@@ -31,6 +31,7 @@ figures/              ヘッダー背景・顔写真・ファビコン(アルパ
 | 氏名(日/英) | `profile/profile.json` の `name_ja` / `name_en` | ヘッダー表示・タブタイトル・JSON-LD の `name` / `alternateName` に自動反映。⚠ `<title>`・OGP・noscript は手動 |
 | 所属・肩書 | `profile/profile.json` の `affiliations_ja` / `affiliations_en` | ヘッダーのタグ表示に自動反映。⚠ noscript・JSON-LD の `affiliation` は手動 |
 | SNS・外部プロフィール URL | `profile/profile.json` の `links` 配列 | SNS ボタンと JSON-LD `sameAs` に自動反映(下記参照)。⚠ noscript 内 Scholar リンクのみ手動 |
+| News(最新のお知らせ) | `data/news.csv` | 自動反映。日付降順で**最新 5 件だけ**表示(上限は `js/app.js` の `NEWS_MAX`)。古い行は残しておいてよい |
 | 研究業績 | `data/research_history.csv` + `data/bibtex_*/` | 自動反映。著者リストは BibTeX から自動抽出 |
 | BibTeX の言語 | `data/bibtex_*/xxx.bib`(原語) + `xxx_en.bib`(英訳) | 日本語発表のみ英訳版を用意する。詳細は下記 |
 | 著者名のローマ字表記 | `data/name_map.json` | サイトは実行時に参照しない(表示は bib のとおり)。`xxx_en.bib` を書くときの typo 防止用の辞書で、CV generator(`~/lab/CV`)も同じファイルを参照 |
@@ -72,6 +73,14 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 - **period**: `2025/3`、`2025/10/20`、`2023/8/27-9/6`、`2021/4 -` の形式に対応。範囲の場合は開始日でソートされる。
 - **award**: セミコロン `;` 区切りで複数の受賞を記述する(例: `若手奨励賞;スポンサー賞`)。
 - **カラム数**: 各行のフィールド数はヘッダーと一致させること。ずれると列の対応が崩れる(ブラウザのコンソールに警告が出る)。
+
+### data/news.csv
+
+`date, text, text_en, link`
+
+- `date` は**出来事の日付ではなく、News として掲載した日**(`2026/10/1` 形式)。この日付の降順で並ぶ。
+
+ページ最上部の News。他のセクションカードとは別のレイアウト(枠なしのテキストブロック)で、`date` の降順に並べて**最新 5 件のみ**表示する(`js/app.js` の `NEWS_MAX`)。行は追記するだけでよく、6 件目以降は自動で隠れるので古い行を消す必要はない。`link` があれば本文がリンクになる。
 
 ### data/research_history.csv
 

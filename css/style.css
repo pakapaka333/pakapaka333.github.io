@@ -11,6 +11,7 @@
   --light-gray: #E6E6E6;
   --sage:       #6aa84f;
   --gold:       #D9A441;
+  --news:       #8B6FC9; /* News 専用。他セクションの色(stone/coral/sky/sage/gold/green)と被らない紫 */
 
   --bg:         #f4f2ef;
   --surface:    #ffffff;
@@ -40,6 +41,7 @@
 
 /* ── Dark Tokens ── */
 :root[data-theme="dark"] {
+  --news:       #a994e0;
   --bg:         #1a1917;
   --surface:    #242220;
   --surface-2:  #2c2a27;
@@ -68,6 +70,7 @@
 /* OS-level dark when no manual override */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    --news:       #a994e0;
     --bg:         #1a1917;
     --surface:    #242220;
     --surface-2:  #2c2a27;
@@ -245,6 +248,7 @@ body {
 .section-card:nth-child(1){animation-delay:0.04s} .section-card:nth-child(2){animation-delay:0.09s}
 .section-card:nth-child(3){animation-delay:0.14s} .section-card:nth-child(4){animation-delay:0.19s}
 .section-card:nth-child(5){animation-delay:0.24s} .section-card:nth-child(6){animation-delay:0.29s}
+.section-card:nth-child(7){animation-delay:0.34s}
 @keyframes fadeUp { from { opacity:0; transform:translateY(13px); } to { opacity:1; transform:translateY(0); } }
 
 .section-header { display:flex; align-items:center; justify-content:space-between; padding:15px 24px; cursor:pointer; user-select:none; border-bottom:1px solid var(--border); background:var(--surface); transition:background 0.13s; }
@@ -259,7 +263,7 @@ body {
 
 .section-title { display:flex; align-items:center; gap:10px; }
 .section-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-.dot-research{background:var(--stone)} .dot-activities{background:var(--coral)}
+.dot-news{background:var(--news)} .dot-research{background:var(--stone)} .dot-activities{background:var(--coral)}
 .dot-grants{background:var(--gold)} .dot-education{background:var(--sky)} .dot-business{background:var(--sage)} .dot-skills{background:#8aba78}
 
 .section-label { font-family:'DM Serif Display',serif; font-size:1.13rem; color:var(--text); }
@@ -404,6 +408,19 @@ td:first-child { padding-left:24px; }
 .skill-name { font-weight:500; color:var(--text); }
 .empty-state { text-align:center; padding:36px; color:var(--muted); font-size:13px; }
 
+/* ── News: 枠・カード・左バーなし。背景の上に直接置くテキストブロック。
+   小さなラベルの下に、日付 + 本文の行を細い罫線で区切って並べる(最新 NEWS_MAX 件 / app.js) ── */
+.news-box { padding:0 8px; animation:fadeUp 0.42s ease both; }
+.news-head { display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+.news-label { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:400; letter-spacing:0.18em; text-transform:uppercase; color:var(--news); }
+.news-head::after { content:''; flex:1; height:1px; background:var(--border); }
+.news-list { list-style:none; margin:0; padding:0; }
+.news-item { display:flex; gap:18px; align-items:baseline; padding:9px 0; border-bottom:1px dashed var(--border); }
+.news-item:last-child { border-bottom:none; }
+.news-date { font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--muted); white-space:nowrap; flex-shrink:0; min-width:72px; }
+.news-text { font-size:14.5px; color:var(--text); line-height:1.5; }
+.news-empty { font-size:13px; color:var(--muted); padding:6px 0; }
+
 /* ── In-table hyperlinks ── */
 .td-link {
   color: inherit;
@@ -542,6 +559,10 @@ td:first-child { padding-left:24px; }
   .td-mobile-meta .badge { margin-top: 0; }
   .td-period { min-width: 0; font-size: 11px; }
   td, thead th { padding-right: 12px; }
+
+  /* News: モバイルは各行で日付の下に本文 */
+  .news-box { padding:0 4px; }
+  .news-item { flex-direction:column; gap:2px; }
 
   /* 目次はモバイルでは初期状態で閉じる(JS 側で制御) */
   .toc { left: 12px; }
