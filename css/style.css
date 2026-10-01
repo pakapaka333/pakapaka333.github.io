@@ -10,6 +10,7 @@
   --sky:        #3AABD2;
   --light-gray: #E6E6E6;
   --sage:       #6aa84f;
+  --gold:       #D9A441;
 
   --bg:         #f4f2ef;
   --surface:    #ffffff;
@@ -243,7 +244,7 @@ body {
 .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; animation: fadeUp 0.42s ease both; transition: background 0.25s, border-color 0.25s; }
 .section-card:nth-child(1){animation-delay:0.04s} .section-card:nth-child(2){animation-delay:0.09s}
 .section-card:nth-child(3){animation-delay:0.14s} .section-card:nth-child(4){animation-delay:0.19s}
-.section-card:nth-child(5){animation-delay:0.24s}
+.section-card:nth-child(5){animation-delay:0.24s} .section-card:nth-child(6){animation-delay:0.29s}
 @keyframes fadeUp { from { opacity:0; transform:translateY(13px); } to { opacity:1; transform:translateY(0); } }
 
 .section-header { display:flex; align-items:center; justify-content:space-between; padding:15px 24px; cursor:pointer; user-select:none; border-bottom:1px solid var(--border); background:var(--surface); transition:background 0.13s; }
@@ -251,6 +252,7 @@ body {
 
 #sec-research   .section-header { border-left:4px solid var(--stone); }
 #sec-activities .section-header { border-left:4px solid var(--coral); }
+#sec-grants     .section-header { border-left:4px solid var(--gold); }
 #sec-education  .section-header { border-left:4px solid var(--sky); }
 #sec-business   .section-header { border-left:4px solid var(--sage); }
 #sec-skills     .section-header { border-left:4px solid #8aba78; }
@@ -258,7 +260,7 @@ body {
 .section-title { display:flex; align-items:center; gap:10px; }
 .section-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
 .dot-research{background:var(--stone)} .dot-activities{background:var(--coral)}
-.dot-education{background:var(--sky)} .dot-business{background:var(--sage)} .dot-skills{background:#8aba78}
+.dot-grants{background:var(--gold)} .dot-education{background:var(--sky)} .dot-business{background:var(--sage)} .dot-skills{background:#8aba78}
 
 .section-label { font-family:'DM Serif Display',serif; font-size:1.13rem; color:var(--text); }
 .section-count { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); margin-left:4px; }
