@@ -345,6 +345,29 @@ function makeSection({ id, dotClass, label, count, bodyHTML }) {
    TABLE BUILDERS
 ════════════════════════════════════════════ */
 
+/* ── News ──
+   他のセクションカードとは別のレイアウト: 折りたたみヘッダーのない帯状ボックスに
+   見出しを横並びで置き、最新 NEWS_MAX 件だけを表示する。
+   データは data/news.csv: date(News として掲載した日), text, text_en, link */
+const NEWS_MAX = 5;
+function buildNewsBox(data, lang) {
+  const box = document.createElement('section');
+  box.className = 'news-box'; box.id = 'sec-news';
+  box.setAttribute('aria-label', LANG.sections.news);
+  const items = (data ?? [])
+    .filter(r => (r.text ?? '').trim() !== '')
+    .sort((a, b) => periodToDate(b.date) - periodToDate(a.date))
+    .slice(0, NEWS_MAX);
+  const body = items.length
+    ? `<ul class="news-list">${items.map(r => `<li class="news-item">
+        <span class="news-date">${r.date}</span>
+        <span class="news-text">${linkWrap(field(r, 'text', lang), r.link)}</span>
+      </li>`).join('')}</ul>`
+    : `<div class="news-empty">${LANG.newsEmpty}</div>`;
+  box.innerHTML = `<div class="news-head"><span class="news-label">${LANG.sections.news}</span></div>${body}`;
+  return box;
+}
+
 /* ── Research ── */
 async function buildResearchSection(data, lang, dataRoot) {
   if (!data) return `<div class="empty-state">⚠ data/research_history.csv not found</div>`;
@@ -778,7 +801,7 @@ function initSkillsTable() {
    モバイルは初期状態で閉じる。
 ════════════════════════════════════════════ */
 function buildTOC() {
-  const sections = document.querySelectorAll('.section-card');
+  const sections = document.querySelectorAll('.news-box, .section-card');
   if (!sections.length) return;
 
   const toc = document.createElement('nav');
@@ -790,8 +813,8 @@ function buildTOC() {
   title.textContent = 'Contents';
   toc.appendChild(title);
   sections.forEach(sec => {
-    const label = sec.querySelector('.section-label')?.textContent ?? sec.id;
-    const dotClass = [...(sec.querySelector('.section-dot')?.classList ?? [])].find(c => c.startsWith('dot-')) ?? '';
+    const label = (sec.querySelector('.section-label') ?? sec.querySelector('.news-label'))?.textContent ?? sec.id;
+    const dotClass = sec.classList.contains('news-box') ? 'dot-news' : ([...(sec.querySelector('.section-dot')?.classList ?? [])].find(c => c.startsWith('dot-')) ?? '');
     const a = document.createElement('a');
     a.className = 'toc-link';
     a.href = `#${sec.id}`;
@@ -860,9 +883,10 @@ function initSortableA11y() {
 async function initPage(lang, dataRoot) {
   _updateToggleUI(_resolveTheme());
 
-  const [profile, recentItems, business, education, research, activities, grants, skills] = await Promise.all([
+  const [profile, recentItems, news, business, education, research, activities, grants, skills] = await Promise.all([
     loadJSON(dataRoot + 'profile/profile.json'),
     loadJSON(dataRoot + 'recent_items/items/recent.json'),
+    loadCSV(dataRoot + 'data/news.csv'),
     loadCSV(dataRoot + 'data/business_history.csv'),
     loadCSV(dataRoot + 'data/education_history.csv'),
     loadCSV(dataRoot + 'data/research_history.csv'),
@@ -876,6 +900,8 @@ async function initPage(lang, dataRoot) {
 
   const main = document.getElementById('mainContent');
   main.innerHTML = '';
+
+  main.appendChild(buildNewsBox(news, lang));
 
   const researchHTML = await buildResearchSection(research, lang, dataRoot);
   const researchCard = makeSection({ id:'sec-research', dotClass:'dot-research', label:LANG.sections.research, count:research?.length??null, bodyHTML:researchHTML });

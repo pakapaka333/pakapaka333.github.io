@@ -1,6 +1,6 @@
 /* lang/en.js */
 const LANG = {
-  sections: { research:'Research', activities:'Activities', grants:'Grants & Fellowships', education:'Education', business:'Business', skills:'Skills' },
+  sections: { news:'News', research:'Research', activities:'Activities', grants:'Grants & Fellowships', education:'Education', business:'Business', skills:'Skills' },
   period:'Period', titleVenue:'Title / Venue', authors:'Authors', award:'Award',
   title:'Title', details:'Details',
   school:'Institution', department:'Department / Program', degreeStatus:'Degree / Status',
@@ -17,5 +17,6 @@ const LANG = {
   noResults:'No matching results.',
   recentContent:'Recent Work',
   toc:'Table of contents',
+  newsEmpty:'No news yet.',
   theme: { switchToDark:'Switch to dark mode', switchToLight:'Switch to light mode' },
 };
