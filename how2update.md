@@ -84,10 +84,11 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 
 ### data/research_history.csv
 
-`period, title, title_en, venue, venue_en, venue_link, venue_type, paper_link, slide_link, poster_link, implementation, award, award_en, is_first_author, is_domestic, is_reviewed, bibSrc, bibSrc_en`
+`period, title, title_en, venue, venue_en, venue_link, venue_type, paper_link, slide_link, poster_link, implementation, project_page, award, award_en, is_first_author, is_domestic, is_reviewed, bibSrc, bibSrc_en`
 
 - `is_first_author` / `is_domestic` / `is_reviewed`: `true` / `false`
 - `implementation`: 実装を公開している場合の URL(GitHub リポジトリ、Hugging Face など)。空欄ならリンクは表示されない。
+- `project_page`: 論文のプロジェクトページ(紹介ページ)の URL。空欄ならリンクは表示されない。
 - `bibSrc` / `bibSrc_en`: リポジトリルートからの相対パス(例: `data/bibtex_first/xxx.bib`)。著者リストはこの BibTeX の `author` フィールドから自動抽出され、`{ } BibTeX` ボタンの中身にもなる。**言語の扱いは下記「BibTeX の言語」を参照**。
 - **日本語名の共著者が増えたら** `data/name_map.json` にローマ字表記を追加する(`_en.bib` の執筆時と CV が参照)。
 
