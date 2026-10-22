@@ -18,5 +18,6 @@ const LANG = {
   recentContent:'Recent Work',
   toc:'Table of contents',
   newsEmpty:'No news yet.',
+  interests:'Research',
   theme: { switchToDark:'Switch to dark mode', switchToLight:'Switch to light mode' },
 };

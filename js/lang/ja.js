@@ -18,5 +18,6 @@ const LANG = {
   recentContent:'直近のコンテンツ',
   toc:'目次',
   newsEmpty:'お知らせはありません',
+  interests:'研究テーマ',
   theme: { switchToDark:'ダークモードに切り替え', switchToLight:'ライトモードに切り替え' },
 };

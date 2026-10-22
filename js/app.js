@@ -122,22 +122,55 @@ document.addEventListener('keydown', e => {
 
 /* ════════════════════════════════════════════
    THEME
-   Priority: 1) user's explicit localStorage choice
-             2) OS prefers-color-scheme (default)
-   → First-time visitors always see their OS theme.
-   → Returning visitors see what they last chose.
+   Modes:
+     auto  … no localStorage('theme'). data-theme is NOT set, so css/style.css
+             follows the OS via @media (prefers-color-scheme) and tracks OS
+             changes live. This is the default for every visitor.
+     light / dark … explicit override stored in localStorage('theme') and
+             mirrored to <html data-theme>. Set by the toggle button.
+   Toggle rule: clicking switches to the opposite of the *effective* theme.
+     If that target equals the OS theme, the override is cleared (back to auto)
+     instead of being stored, so the site keeps following the device whenever
+     the user's choice and the device agree.
+   The same bootstrap logic runs inline in <head> to avoid a flash.
 ════════════════════════════════════════════ */
-function _resolveTheme() {
-  const stored = localStorage.getItem('theme');
-  if (stored === 'dark' || stored === 'light') return stored;
-  // No stored preference → respect OS setting
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+const _osDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
+
+function _osTheme() { return _osDarkMQ.matches ? 'dark' : 'light'; }
+
+function _storedTheme() {
+  try {
+    const s = localStorage.getItem('theme');
+    return (s === 'dark' || s === 'light') ? s : null;
+  } catch (e) { return null; }
 }
 
-// Called inline in <head> before render to prevent flash
-(function applyStoredTheme() {
-  document.documentElement.setAttribute('data-theme', _resolveTheme());
+function _effectiveTheme() { return _storedTheme() ?? _osTheme(); }
+
+function _applyTheme(override) {
+  const root = document.documentElement;
+  try {
+    if (override) { localStorage.setItem('theme', override); root.setAttribute('data-theme', override); }
+    else          { localStorage.removeItem('theme');        root.removeAttribute('data-theme'); }
+  } catch (e) {
+    if (override) root.setAttribute('data-theme', override); else root.removeAttribute('data-theme');
+  }
+  _updateToggleUI(_effectiveTheme());
+}
+
+// Startup: an override that merely matches the OS is redundant → drop it so the
+// page goes back to following the device (also cleans up values stored by the
+// previous implementation, which wrote the theme on every visit).
+(function initTheme() {
+  const stored = _storedTheme();
+  if (stored && stored === _osTheme()) _applyTheme(null);
+  else if (stored) document.documentElement.setAttribute('data-theme', stored);
+  else document.documentElement.removeAttribute('data-theme');
 })();
+
+// Follow OS changes while the page is open (only matters in auto mode; the CSS
+// already re-renders, this just keeps the button icon in sync).
+_osDarkMQ.addEventListener('change', () => _updateToggleUI(_effectiveTheme()));
 
 function _updateToggleUI(theme) {
   const btn = document.getElementById('themeToggle');
@@ -151,10 +184,8 @@ function _updateToggleUI(theme) {
 }
 
 function toggleTheme() {
-  const next = _resolveTheme() === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-  _updateToggleUI(next);
+  const next = _effectiveTheme() === 'dark' ? 'light' : 'dark';
+  _applyTheme(next === _osTheme() ? null : next);
 }
 
 /* ── SNS links ──
@@ -200,6 +231,20 @@ function renderProfile(p, lang) {
   affiliations.forEach(a => {
     const s = document.createElement('span'); s.className = 'affil-tag'; s.textContent = a; ad.appendChild(s);
   });
+
+  // Research interests: one text line under the affiliation pills (not pills, to keep the header light)
+  const interests = lang === 'en'
+    ? (p.interests_en ?? p.interests ?? [])
+    : (p.interests_ja ?? p.interests ?? []);
+  const idv = document.getElementById('profileInterests');
+  if (idv && interests.length) {
+    const lab = document.createElement('span'); lab.className = 'interests-label'; lab.textContent = LANG.interests;
+    idv.appendChild(lab);
+    interests.forEach((it, i) => {
+      if (i) { const sep = document.createElement('span'); sep.className = 'interests-sep'; sep.textContent = '·'; idv.appendChild(sep); }
+      const s = document.createElement('span'); s.className = 'interests-item'; s.textContent = it; idv.appendChild(s);
+    });
+  }
 
   const sd = document.getElementById('profileSns');
   (p.links ?? []).forEach(l => {
@@ -903,7 +948,7 @@ function initSortableA11y() {
    initPage — entry point called by each HTML page
 ════════════════════════════════════════════ */
 async function initPage(lang, dataRoot) {
-  _updateToggleUI(_resolveTheme());
+  _updateToggleUI(_effectiveTheme());
 
   const [profile, recentItems, news, business, education, research, activities, grants, skills] = await Promise.all([
     loadJSON(dataRoot + 'profile/profile.json'),

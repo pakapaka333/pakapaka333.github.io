@@ -4,6 +4,7 @@
 
 /* ── Palette & Semantic Tokens (Light) ── */
 :root {
+  color-scheme: light;
   --stone:      #AD9F94;
   --charcoal:   #595959;
   --coral:      #DF5656;
@@ -41,6 +42,7 @@
 
 /* ── Dark Tokens ── */
 :root[data-theme="dark"] {
+  color-scheme: dark;
   --news:       #a994e0;
   --bg:         #1a1917;
   --surface:    #242220;
@@ -67,9 +69,11 @@
   --preprint-bd: #3d4a56;
 }
 
-/* OS-level dark when no manual override */
+/* OS-level dark when no manual override (data-theme unset = auto mode; see js/app.js THEME).
+   Tokens must stay identical to the :root[data-theme="dark"] block above. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    color-scheme: dark;
     --news:       #a994e0;
     --bg:         #1a1917;
     --surface:    #242220;
@@ -179,9 +183,8 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
   transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.15s;
 }
-/* In dark mode: light fill so ☀️ pops and signals "switch to light" */
-:root[data-theme="dark"] .theme-toggle,
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]):not([data-theme="dark"]) .theme-toggle { } }
+/* In dark mode: light fill so ☀️ pops and signals "switch to light".
+   data-mode is set by js/app.js from the *effective* theme (override or OS). */
 .theme-toggle[data-mode="dark"] {
   background: rgba(255,255,255,0.85);
   border-color: rgba(255,255,255,0.9);
@@ -219,6 +222,10 @@ body {
 .name-sub { display: block; font-family: 'Noto Sans JP', sans-serif; font-size: 1rem; font-weight: 300; opacity: 0.82; margin-top: 3px; }
 .header-name .affiliation { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
 .affil-tag { font-size: 12px; font-weight: 400; letter-spacing: 0.03em; background: rgba(255,255,255,0.13); border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 3px 12px; backdrop-filter: blur(6px); }
+
+.header-interests { margin-top: 8px; font-size: 12px; font-weight: 300; letter-spacing: 0.02em; color: rgba(255,255,255,0.82); display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 7px; row-gap: 2px; }
+.interests-label { font-size: 10px; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-right: 3px; }
+.interests-sep { color: rgba(255,255,255,0.45); }
 
 .header-sns { display: flex; gap: 8px; margin-top: 12px; }
 .sns-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: rgba(255,255,255,0.82); background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.28); border-radius: 50%; text-decoration: none; backdrop-filter: blur(4px); transition: background 0.15s, color 0.15s, transform 0.15s; }
@@ -528,6 +535,7 @@ td:first-child { padding-left:24px; }
   .header-content { flex-direction:column; align-items:center; padding:64px 20px 36px; text-align:center; }
   .header-name h1 { font-size:1.9rem; }
   .header-name .affiliation { justify-content:center; }
+  .header-interests { justify-content:center; }
   .header-sns { justify-content:center; }
   .header-recent-wrap { align-items:center; }
   .header-recent { justify-content:center; flex-wrap:wrap; }

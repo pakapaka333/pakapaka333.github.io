@@ -2,14 +2,16 @@
 
 個人ページ(GitHub Pages)。静的 HTML + JavaScript で、コンテンツは CSV / JSON から動的にレンダリングされる。
 
-- 日本語版: https://pakapaka333.github.io/
-- 英語版: https://pakapaka333.github.io/en/
+- 英語版(デフォルト): https://pakapaka333.github.io/
+- 日本語版: https://pakapaka333.github.io/ja/
+- 旧 URL `https://pakapaka333.github.io/en/` はルートへ自動転送(`en/index.html` は転送専用スタブ)
 
 ## 構成
 
 ```
-index.html            日本語版エントリ
-en/index.html         英語版エントリ(js/lang/en.js を読み込み、dataRoot='../' で初期化)
+index.html            英語版エントリ(デフォルト。js/lang/en.js を読み込み、dataRoot='' で初期化)
+ja/index.html         日本語版エントリ(js/lang/ja.js を読み込み、dataRoot='../' で初期化)
+en/index.html         旧 URL からルートへの転送スタブ(中身は編集しない)
 css/style.css         共通スタイル(ライト/ダークテーマ対応。画像パスもここに一元化)
 js/app.js             共通ロジック(言語非依存)
 js/lang/{ja,en}.js    UI 文言(LANG オブジェクト)
@@ -22,6 +24,16 @@ data/bibtex_co/       共著論文の BibTeX(同上)
 figures/              ヘッダー背景・顔写真・ファビコン(アルパカアイコン)
 ```
 
+### URL と言語
+
+| URL | 言語 | ファイル |
+|---|---|---|
+| `/` | 英語(デフォルト・`hreflang=x-default`) | `index.html` |
+| `/ja/` | 日本語 | `ja/index.html` |
+| `/en/` | 旧 URL。`/` へ転送(`#hash` も引き継ぐ) | `en/index.html`(転送スタブ) |
+
+GitHub Pages にはサーバー側リダイレクトが無いため、`/en/` は `location.replace` + `<meta http-equiv="refresh">` で転送している。両ページの `<head>` にある `canonical` / `hreflang` / `og:url` / JSON-LD `url` もこの対応に合わせてある。
+
 ## 情報と管理場所の対応表
 
 「どの情報をどこで更新するか」の一覧。⚠ 付きは技術的制約により手動で複数箇所の更新が必要なもの(詳細は後述の「特記事項」)。
@@ -29,7 +41,8 @@ figures/              ヘッダー背景・顔写真・ファビコン(アルパ
 | 情報 | 管理場所 | 反映先・更新方法 |
 |---|---|---|
 | 氏名(日/英) | `profile/profile.json` の `name_ja` / `name_en` | ヘッダー表示・タブタイトル・JSON-LD の `name` / `alternateName` に自動反映。⚠ `<title>`・OGP・noscript は手動 |
-| 所属・肩書 | `profile/profile.json` の `affiliations_ja` / `affiliations_en` | ヘッダーのタグ表示に自動反映。⚠ noscript・JSON-LD の `affiliation` は手動 |
+| 所属・肩書 | `profile/profile.json` の `affiliations_ja` / `affiliations_en` | ヘッダーのタグ(ピル)表示に自動反映。⚠ noscript・JSON-LD の `affiliation` は手動 |
+| 研究テーマ | `profile/profile.json` の `interests_ja` / `interests_en` | ピルの下に 1 行のテキスト(`研究テーマ` / `Research` ラベル付き、` · ` 区切り)で自動反映。ピルを増やさずに済むよう別枠にしている。空配列なら行ごと非表示 |
 | SNS・外部プロフィール URL | `profile/profile.json` の `links` 配列 | SNS ボタンと JSON-LD `sameAs` に自動反映(下記参照)。⚠ noscript 内 Scholar リンクのみ手動 |
 | News(最新のお知らせ) | `data/news.csv` | 自動反映。日付降順で**最新 5 件だけ**表示(上限は `js/app.js` の `NEWS_MAX`)。古い行は残しておいてよい |
 | 研究業績 | `data/research_history.csv` + `data/bibtex_*/` | 自動反映。著者リストは BibTeX から自動抽出 |
@@ -44,8 +57,8 @@ figures/              ヘッダー背景・顔写真・ファビコン(アルパ
 | UI 文言(見出し・ボタン等) | `js/lang/ja.js` / `js/lang/en.js` | `LANG` オブジェクトを両言語で対で編集 |
 | 画像(顔写真・ヘッダー背景) | `figures/` + パス指定は `css/style.css` のみ | ファイル差し替えのみで両ページに反映 |
 | ファビコン(タブのアイコン) | `figures/favicon.svg`(主) / `favicon.png`(48px フォールバック) / `apple-touch-icon.png`(180px) | 差し替えのみ。アルパカアイコン(白塗り＋黒線画)。詳細は下記「ファビコン」節 |
-| ページメタ(title/description/OGP) | ⚠ `index.html` / `en/index.html` に直書き | 両ファイルを手動で対で編集 |
-| サイト URL(canonical/hreflang 等) | ⚠ `index.html` / `en/index.html` に直書き | ドメイン変更時のみ両ファイルを一括置換 |
+| ページメタ(title/description/OGP) | ⚠ `index.html` / `ja/index.html` に直書き | 両ファイルを手動で対で編集 |
+| サイト URL(canonical/hreflang 等) | ⚠ `index.html` / `ja/index.html` / `en/index.html` に直書き | ドメイン変更時のみ 3 ファイルを一括置換 |
 | 表の初期表示行数 | `js/app.js` の `DEFAULT_ROWS`(コード定数) | 数値を変更 |
 
 ## データ更新のルール
@@ -166,17 +179,22 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 
 | 情報 | 直書き箇所 | 直書きが必要な理由 |
 |---|---|---|
-| `<title>`・meta description・OGP・Twitter Card | `index.html` / `en/index.html` の `<head>` | X・Slack・LINE などの SNS クローラーは JS を実行せず静的 HTML だけを読むため、JS で注入しても認識されない |
+| `<title>`・meta description・OGP・Twitter Card | `index.html` / `ja/index.html` の `<head>` | X・Slack・LINE などの SNS クローラーは JS を実行せず静的 HTML だけを読むため、JS で注入しても認識されない |
 | canonical / hreflang / og:url のサイト URL | 同上 | 同上(かつ `<head>` 内リンク要素はクローラーが初期 HTML で評価する) |
 | JSON-LD の `url` / `image` / `affiliation` | 両 HTML の `<head>` 内 `application/ld+json` | JS 非実行クローラー向けの静的フォールバック。`name` / `alternateName` / `sameAs` は `app.js` が profile.json から上書きするので、**氏名・リンク変更時にここは触らなくてよい**(所属変更時のみ手動) |
 | `<noscript>` の氏名・所属・Scholar リンク | 両 HTML の `<body>` 末尾 | noscript は「JS が無効な環境」でだけ表示される領域なので、原理的に JS から内容を注入できない |
 | 「読み込み中…」テキスト | 両 HTML の `<main>` 内 | JS がデータを取得する前に表示されるプレースホルダーのため |
 
-運用上は「**氏名・所属・メタ情報を変えるときだけ `index.html` と `en/index.html` を対で grep して更新する**」と覚えておけばよい。それ以外の日常的な更新(業績・活動・スキル・リンク追加)はすべて JSON / CSV の編集だけで完結する。
+運用上は「**氏名・所属・メタ情報を変えるときだけ `index.html` と `ja/index.html` を対で grep して更新する**」と覚えておけばよい。それ以外の日常的な更新(業績・活動・スキル・リンク追加)はすべて JSON / CSV の編集だけで完結する。
 
 ## デザイン面の挙動メモ
 
-- **テーマ**: 初回訪問時は OS の設定(`prefers-color-scheme`)に従い、ボタンで切り替えると以降はその選択で固定される。選択は `localStorage('theme')` に保存。
+- **テーマ**: 3 状態。
+  - **auto(デフォルト)**: `localStorage('theme')` なし。`<html>` に `data-theme` を付けず、`css/style.css` の `@media (prefers-color-scheme: dark)` が OS 設定に追従する(ページを開いたまま OS を切り替えても追従)。
+  - **light / dark(手動上書き)**: ボタンで切り替えると `localStorage('theme')` に保存し `data-theme` を付ける。
+  - ボタンは「今見えているテーマの反対」へ切り替える。切り替え先が OS 設定と同じなら上書きを**消して auto に戻す**(= OS と一致した時点でまた端末に追従する)。読み込み時も「上書き値 = OS 設定」なら自動で消す。
+  - 実装は `js/app.js` の THEME ブロック。ちらつき防止のため同じ判定を両 HTML の `<head>` インラインスクリプトでも行っている(**上書きがある時だけ** `data-theme` を付ける。常に付けると CSS の OS 判定が死ぬので注意)。
+  - ダーク用トークンは `:root[data-theme="dark"]` と `@media` 内の 2 か所に同じ内容があるので、色を変えるときは両方を編集する。
 - **目次サイドバー**: セクションから自動生成される黒半透明パネル(見出し "Contents" 付き)。左上の ☰ で開閉し、状態は `localStorage('tocHidden')` に保存。初期状態は画面幅 1400px 以上でのみ表示(狭い画面では本文に重なるため)。
 - **モバイル(768px 以下)**: 全テーブルが「時期 + 内容」の2列に圧縮される。デスクトップの3列目以降(`hide-mobile` クラス)は隠れ、内容は `.td-mobile-meta` として2列目に畳み込まれる。ヘッダーの QR コードはリンクピルに置き換わる。
 - **固定コントロール(JA/EN・テーマ)**: ヘッダーを過ぎてスクロールすると `scrolled` クラスが付き、カード風配色に切り替わる(白背景で読めなくなるのを防ぐ)。
@@ -187,7 +205,7 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 `figures/` の画像は表示サイズに合わせて縮小済み(顔写真 400px、ヘッダー 1600px 幅)。 <br>
 差し替える際も同程度に圧縮すること。
 
-画像のパス指定は `css/style.css` のみにある(CSS の `url()` はスタイルシートの場所を基準に解決されるため、`en/` 配下のページでも同じ指定で動く)。ファイル名を変えない限り HTML の変更は不要。
+画像のパス指定は `css/style.css` のみにある(CSS の `url()` はスタイルシートの場所を基準に解決されるため、`ja/` 配下のページでも同じ指定で動く)。ファイル名を変えない限り HTML の変更は不要。
 
 ## ファビコン(ブラウザタブ / ホーム画面のアイコン)
 
@@ -201,7 +219,7 @@ Google Scholar / LinkedIn / X / GitHub などの URL は **`profile/profile.json
 | `favicon.png` | SVG 非対応の古いブラウザ向けフォールバック | 48px |
 | `apple-touch-icon.png` | iOS のホーム画面追加用 | 180px |
 
-HTML 側の参照(`index.html` / `en/index.html` の `<head>`。SVG → PNG の順でフォールバック):
+HTML 側の参照(`index.html` / `ja/index.html` の `<head>`。`ja/` 側は `../figures/...`。SVG → PNG の順でフォールバック):
 
 ```html
 <link rel="icon" type="image/svg+xml" href="figures/favicon.svg">

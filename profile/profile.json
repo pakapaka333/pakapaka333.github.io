@@ -2,21 +2,43 @@
   "name_ja": "齋藤 幸史郎",
   "name_en": "Koshiro Saito",
   "affiliations_ja": [
-    "東京科学大学 情報理工学院 情報工学系 知能情報コース 修士課程2年生",
+    "東京科学大学 情報理工学院 情報工学系 知能情報コース 修士課程2年生（岡崎研究室）",
     "日本学術振興会 特別研究員 DC1（採用内定 / 2027年4月〜）",
     "Swallow LLM: 評価チーム 学生リーダー",
-    "PUPPET: 検出されやすいLLM"
+    "株式会社Preferred Networks リサーチエンジニアインターン"
   ],
   "affiliations_en": [
-    "M2 Student, School of Computing, Science Tokyo",
+    "M2 Student, Okazaki Lab, School of Computing, Science Tokyo",
     "JSPS Research Fellow DC1 (accepted / from April 2027)",
     "Swallow LLM: Student Lead, Evaluation Team",
-    "PUPPET: Detectable LLM"
+    "Research Engineer Intern, Preferred Networks Inc."
+  ],
+  "interests_ja": [
+    "LLM の安全性・公平性",
+    "テキスト透かし・検出",
+    "拡散言語モデル"
+  ],
+  "interests_en": [
+    "LLM Safety/Fairness",
+    "Text Watermarking/Detection",
+    "Diffusion LM"
   ],
   "links": [
-    { "type": "linkedin", "url": "https://www.linkedin.com/in/koshiro-saito/" },
-    { "type": "x", "url": "https://x.com/koshiro_sa110" },
-    { "type": "scholar", "url": "https://scholar.google.co.jp/citations?user=h8HGRU4AAAAJ" },
-    { "type": "github", "url": "https://github.com/pakapaka333" }
+    {
+      "type": "linkedin",
+      "url": "https://www.linkedin.com/in/koshiro-saito/"
+    },
+    {
+      "type": "x",
+      "url": "https://x.com/koshiro_sa110"
+    },
+    {
+      "type": "scholar",
+      "url": "https://scholar.google.co.jp/citations?user=h8HGRU4AAAAJ"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/pakapaka333"
+    }
   ]
 }

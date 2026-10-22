@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>齋藤 幸史郎 (Koshiro Saito)</title>
+<!-- <meta name="description" content=""> -->
+<link rel="canonical" href="https://pakapaka333.github.io/ja/">
+<link rel="alternate" hreflang="ja" href="https://pakapaka333.github.io/ja/">
+<link rel="alternate" hreflang="en" href="https://pakapaka333.github.io/">
+<link rel="alternate" hreflang="x-default" href="https://pakapaka333.github.io/">
+<link rel="icon" type="image/svg+xml" href="../figures/favicon.svg">
+<link rel="icon" type="image/png" href="../figures/favicon.png">
+<link rel="apple-touch-icon" href="../figures/apple-touch-icon.png">
+<!-- OGP / Twitter Card -->
+<meta property="og:type" content="profile">
+<meta property="og:title" content="齋藤 幸史郎 (Koshiro Saito)">
+<!-- <meta property="og:description" content=""> -->
+<meta property="og:url" content="https://pakapaka333.github.io/ja/">
+<meta property="og:image" content="https://pakapaka333.github.io/figures/face_picture_trimmed.png">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="齋藤 幸史郎 (Koshiro Saito)">
+<!-- <meta name="twitter:description" content=""> -->
+<meta name="twitter:image" content="https://pakapaka333.github.io/figures/face_picture_trimmed.png">
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Koshiro Saito",
+  "alternateName": "齋藤 幸史郎",
+  "url": "https://pakapaka333.github.io/ja/",
+  "image": "https://pakapaka333.github.io/figures/face_picture_trimmed.png",
+  "affiliation": {
+    "@type": "CollegeOrUniversity",
+    "name": "Institute of Science Tokyo"
+  }
+}
+</script>
+<!-- sameAs (SNSリンク) は profile/profile.json の links から app.js が注入する -->
+
+<!-- Theme bootstrap: apply the user's explicit override (if any) before first paint.
+     With no override, data-theme stays unset and css/style.css follows the OS via prefers-color-scheme,
+     so OS changes are picked up live. See js/app.js THEME. -->
+<script>
+  (function(){
+    try{
+      var s=localStorage.getItem('theme');
+      if(s==='dark'||s==='light'){document.documentElement.setAttribute('data-theme',s);}
+    }catch(e){}
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<!-- 画像パスは css/style.css に一元化(CSS の url() はスタイルシート基準で解決されるため ja/ でも同じものが使える) -->
+</head>
+<body>
+
+<!-- Fixed controls: lang switch + theme toggle -->
+<div class="fixed-controls">
+  <nav class="lang-switch" aria-label="言語切り替え">
+    <span class="lang-btn active">JA</span>
+    <a class="lang-btn" href="../">EN</a>
+  </nav>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="テーマ切り替え">🌙</button>
+</div>
+
+<!-- BibTeX Modal -->
+<div class="modal-overlay" id="bibtexModal" onclick="closeBibtexModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">BibTeX</span>
+      <button class="modal-close" onclick="document.getElementById('bibtexModal').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body"><pre class="bibtex-code" id="bibtexContent"></pre></div>
+    <div class="modal-footer">
+      <button class="copy-btn" id="copyBtn" onclick="copyBibtex()">コピー</button>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="header-wrap">
+  <div class="header-bg-fallback"></div>
+  <div class="header-bg"></div>
+  <div class="header-content">
+    <div class="face-photo" role="img" aria-label="プロフィール写真"></div>
+    <div class="header-name">
+      <h1><span id="profileNameMain">…</span><span class="name-sub" id="profileNameSub"></span></h1>
+      <div class="affiliation" id="profileAffiliations"></div>
+      <div class="header-interests" id="profileInterests"></div>
+      <div class="header-sns" id="profileSns"></div>
+    </div>
+    <div class="header-recent-wrap">
+      <span class="recent-label" id="recentLabelEl"></span>
+      <div class="header-recent" id="qrContainer"></div>
+    </div>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="main" id="mainContent">
+  <!-- スケルトン: JS がデータを取得するまでのプレースホルダー -->
+  <div class="skeleton-card" aria-hidden="true"><div class="sk-bar sk-title"></div><div class="sk-bar w85"></div><div class="sk-bar w60"></div></div>
+  <div class="skeleton-card" aria-hidden="true"><div class="sk-bar sk-title"></div><div class="sk-bar w85"></div><div class="sk-bar w60"></div></div>
+  <div class="skeleton-card" aria-hidden="true"><div class="sk-bar sk-title"></div><div class="sk-bar w60"></div></div>
+</main>
+
+<noscript>
+  <div style="max-width:1100px;margin:0 auto;padding:24px 48px;">
+    <p>このページの表示には JavaScript が必要です。</p>
+    <p>齋藤 幸史郎 (Koshiro Saito) — 東京科学大学 情報理工学院 修士課程。日本学術振興会 特別研究員 DC1（採用内定 / 2027年4月〜）。
+      研究業績は <a href="https://scholar.google.co.jp/citations?user=h8HGRU4AAAAJ">Google Scholar</a> をご覧ください。</p>
+  </div>
+</noscript>
+
+<script src="../js/lang/ja.js"></script>
+<script src="../js/app.js"></script>
+<script>initPage('ja', '../');</script>
+</body>
+</html>
